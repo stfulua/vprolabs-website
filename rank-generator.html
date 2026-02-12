@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generator Rang Minecraft</title>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #222;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        h1 { margin-bottom: 10px; }
+        
+        .container {
+            background-color: #333;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 350px;
+        }
+
+        label { font-size: 0.9em; color: #ccc; }
+        
+        input[type="text"], select {
+            width: 100%;
+            padding: 8px;
+            background: #444;
+            border: 1px solid #555;
+            color: white;
+            border-radius: 4px;
+            box-sizing: border-box; /* Ważne dla paddingu */
+        }
+
+        .color-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        input[type="color"] {
+            border: none;
+            width: 50px;
+            height: 30px;
+            cursor: pointer;
+            background: none;
+        }
+
+        canvas {
+            margin-top: 20px;
+            background-image: linear-gradient(45deg, #ccc 25%, transparent 25%), 
+                              linear-gradient(-45deg, #ccc 25%, transparent 25%), 
+                              linear-gradient(45deg, transparent 75%, #ccc 75%), 
+                              linear-gradient(-45deg, transparent 75%, #ccc 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+            border: 2px solid #555;
+            image-rendering: pixelated; /* Kluczowe dla stylu pixel art */
+        }
+
+        .btn-download {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            display: block;
+        }
+        .btn-download:hover { background-color: #45a049; }
+
+        .preview-box {
+            text-align: center;
+            padding: 10px;
+            background: #1a1a1a;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Generator Rang</h1>
+
+    <div class="container">
+        
+        <div>
+            <label>Tekst rangi:</label>
+            <input type="text" id="rankText" value="WŁAŚCICIEL" oninput="drawBadge()">
+        </div>
+
+        <div>
+            <label>Styl:</label>
+            <select id="shapeStyle" onchange="drawBadge()">
+                <option value="square">Prostokąt (Styl Byrg)</option>
+                <option value="chamfer">Ścięte rogi (Styl Seav/Minecraft)</option>
+                <option value="rounded">Zaokrąglony</option>
+            </select>
+        </div>
+
+        <div>
+            <label>Kolory tła (Gradient):</label>
+            <div class="color-row">
+                <input type="color" id="color1" value="#ff0000" oninput="drawBadge()">
+                <input type="color" id="color2" value="#ff8800" oninput="drawBadge()">
+            </div>
+            <label style="font-size: 0.8em; color: #888;">*Dla jednolitego koloru ustaw oba takie same.</label>
+        </div>
+        
+        <div>
+             <label>Kolor tekstu:</label>
+             <div class="color-row">
+                <input type="color" id="textColor" value="#ffffff" oninput="drawBadge()">
+             </div>
+        </div>
+
+        <div class="preview-box">
+            <label>Podgląd:</label><br>
+            <canvas id="canvas"></canvas>
+        </div>
+
+        <a id="downloadLink" class="btn-download" download="ranga.png">Pobierz obrazek</a>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const downloadLink = document.getElementById('downloadLink');
+
+        // Ładujemy font zanim narysujemy
+        document.fonts.load('30px "VT323"').then(drawBadge);
+
+        function drawBadge() {
+            const text = document.getElementById('rankText').value.toUpperCase();
+            const color1 = document.getElementById('color1').value;
+            const color2 = document.getElementById('color2').value;
+            const textColor = document.getElementById('textColor').value;
+            const style = document.getElementById('shapeStyle').value;
+
+            // Ustawienia czcionki
+            const fontSize = 28;
+            ctx.font = `${fontSize}px "VT323"`; // Pixel-style font
+            
+            // Oblicz szerokość na podstawie tekstu
+            const textMetrics = ctx.measureText(text);
+            const textWidth = textMetrics.width;
+            
+            // Padding (margines wewnętrzny)
+            const paddingX = 20; 
+            const height = 40; // Wysokość rangi
+            const width = textWidth + (paddingX * 2);
+
+            // Ustaw rozmiar canvasu
+            canvas.width = width;
+            canvas.height = height;
+
+            // Ponowne ustawienie fontu po zmianie rozmiaru canvasu (resetuje się)
+            ctx.font = `${fontSize}px "VT323"`;
+            ctx.textBaseline = 'middle';
+            ctx.textAlign = 'center';
+
+            // --- RYSOWANIE TŁA ---
+            const gradient = ctx.createLinearGradient(0, 0, width, 0);
+            gradient.addColorStop(0, color1);
+            gradient.addColorStop(1, color2);
+            ctx.fillStyle = gradient;
+
+            if (style === 'chamfer') {
+                // Rysowanie kształtu ze ściętymi rogami (Minecraft style)
+                const cut = 6; // Wielkość ścięcia
+                ctx.beginPath();
+                ctx.moveTo(cut, 0);
+                ctx.lineTo(width - cut, 0);
+                ctx.lineTo(width, cut);
+                ctx.lineTo(width, height - cut);
+                ctx.lineTo(width - cut, height);
+                ctx.lineTo(cut, height);
+                ctx.lineTo(0, height - cut);
+                ctx.lineTo(0, cut);
+                ctx.closePath();
+                
+                // Wypełnienie
+                ctx.fill();
+
+                // Obramowanie (Border) dla stylu Minecraft
+                ctx.strokeStyle = "rgba(0,0,0,0.4)";
+                ctx.lineWidth = 3;
+                ctx.stroke();
+
+            } else if (style === 'rounded') {
+                // Zaokrąglone rogi
+                const radius = 10;
+                ctx.beginPath();
+                ctx.roundRect(0, 0, width, height, radius);
+                ctx.fill();
+            } else {
+                // Zwykły prostokąt
+                ctx.fillRect(0, 0, width, height);
+                
+                // Opcjonalnie: jasna ramka wewnątrz (jak w stylu byrg)
+                ctx.strokeStyle = "rgba(255,255,255,0.3)";
+                ctx.lineWidth = 2;
+                ctx.strokeRect(2, 2, width-4, height-4);
+            }
+
+            // --- RYSOWANIE TEKSTU ---
+            
+            // Cień tekstu (Daje efekt 3D/Pixel)
+            ctx.fillStyle = "black";
+            // Rysujemy cień przesunięty o 2px
+            ctx.fillText(text, (width/2) + 2, (height/2) + 2);
+
+            // Główny tekst
+            ctx.fillStyle = textColor;
+            ctx.fillText(text, width/2, height/2);
+
+            // Aktualizacja linku do pobrania
+            downloadLink.href = canvas.toDataURL("image/png");
+        }
+    </script>
+</body>
+</html>
