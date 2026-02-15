@@ -2,189 +2,258 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🎮 Auto Rank Generator Pro</title>
-    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Press+Start+2P&family=Russo+One&family=Black+Ops+One&family=Bungee&family=Quantico:wght@700&family=Montserrat:wght@800&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>vRankGenerator - vProLabs</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
-        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #0a0a0a;
+            --surface: #111;
+            --surface-hover: #1a1a1a;
+            --border: #222;
+            --text: #e0e0e0;
+            --text-muted: #666;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            color: white;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
             min-height: 100vh;
-            padding: 10px;
         }
 
-        .header {
-            text-align: center;
-            padding: 20px;
-            background: rgba(0,0,0,0.3);
-            border-radius: 15px;
-            margin-bottom: 15px;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .header h1 {
-            font-size: 2em;
-            background: linear-gradient(90deg, #00f260, #0575e6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 5px;
-        }
-
-        .mode-tabs {
+        .lang-select {
+            position: fixed;
+            top: 20px;
+            right: 20px;
             display: flex;
             gap: 10px;
-            margin-bottom: 20px;
-            background: rgba(0,0,0,0.3);
-            padding: 5px;
-            border-radius: 12px;
+            z-index: 100;
         }
 
-        .mode-tab {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            background: transparent;
-            color: #888;
-            border-radius: 8px;
+        .lang-btn {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 8px 16px;
+            border-radius: 6px;
             cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s;
+            font-size: 14px;
+            transition: all 0.2s;
         }
 
-        .mode-tab.active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+        .lang-btn:hover, .lang-btn.active {
+            background: var(--accent);
+            border-color: var(--accent);
         }
 
-        .main-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 15px;
-            max-width: 1400px;
+        .container {
+            max-width: 900px;
             margin: 0 auto;
+            padding: 80px 20px 40px;
         }
 
-        @media (min-width: 1024px) {
-            .main-grid {
-                grid-template-columns: 1fr 1fr;
-            }
+        header {
+            text-align: center;
+            margin-bottom: 60px;
         }
 
-        .panel {
-            background: rgba(255,255,255,0.05);
-            border-radius: 15px;
-            padding: 20px;
-            border: 1px solid rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 8px;
         }
 
-        .panel-title {
-            font-size: 1.2em;
-            margin-bottom: 15px;
-            color: #00f260;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--text);
         }
 
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
 
         label {
             display: block;
-            font-size: 0.85em;
-            color: #aaa;
+            font-size: 0.875rem;
+            color: var(--text-muted);
             margin-bottom: 8px;
-            font-weight: 600;
+            font-weight: 500;
         }
 
         input[type="text"], select {
             width: 100%;
-            padding: 12px;
-            background: rgba(0,0,0,0.3);
-            border: 2px solid rgba(255,255,255,0.1);
-            color: white;
-            border-radius: 10px;
-            font-size: 16px;
-            transition: all 0.3s;
+            padding: 12px 16px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            border-radius: 8px;
+            font-size: 15px;
+            transition: border-color 0.2s;
         }
 
         input[type="text"]:focus, select:focus {
             outline: none;
-            border-color: #00f260;
-            background: rgba(0,0,0,0.5);
-        }
-
-        .gradient-presets {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-            margin-top: 8px;
-        }
-
-        @media (max-width: 600px) {
-            .gradient-presets { grid-template-columns: repeat(3, 1fr); }
-        }
-
-        .preset-btn {
-            height: 45px;
-            border: 3px solid transparent;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.2s;
-            position: relative;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-        }
-
-        .preset-btn:hover { transform: translateY(-2px) scale(1.05); }
-        .preset-btn.active { 
-            border-color: #00f260; 
-            box-shadow: 0 0 15px rgba(0,242,96,0.5);
-        }
-        .preset-btn.active::after {
-            content: '✓';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 24px;
-            text-shadow: 0 0 5px black, 0 0 10px black;
-            font-weight: bold;
+            border-color: var(--accent);
         }
 
         .color-row {
             display: flex;
-            gap: 15px;
+            gap: 12px;
             align-items: center;
         }
 
         input[type="color"] {
             width: 60px;
-            height: 50px;
+            height: 44px;
             border: none;
-            border-radius: 10px;
+            border-radius: 8px;
             cursor: pointer;
             background: none;
         }
 
-        .preview-canvas {
-            width: 100%;
-            max-width: 400px;
+        .gradient-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-bottom: 12px;
+        }
+
+        .gradient-toggle:hover {
+            background: var(--surface-hover);
+        }
+
+        .gradient-toggle span {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .gradient-panel {
+            display: none;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            margin-bottom: 20px;
+            padding: 16px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
+
+        .gradient-panel.open {
+            display: grid;
+        }
+
+        @media (max-width: 600px) {
+            .gradient-panel {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .preset-btn {
+            height: 40px;
+            border: 2px solid transparent;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .preset-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .preset-btn.active {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+        }
+
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            background: var(--bg);
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--accent);
+            cursor: pointer;
+        }
+
+        .checkbox-wrapper label {
+            margin: 0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .help-btn {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--surface-hover);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 12px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .help-btn:hover {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .preview-box {
+            background: var(--bg);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        canvas {
+            max-width: 100%;
             height: auto;
-            background-image: 
-                linear-gradient(45deg, #444 25%, transparent 25%), 
-                linear-gradient(-45deg, #444 25%, transparent 25%), 
-                linear-gradient(45deg, transparent 75%, #444 75%), 
-                linear-gradient(-45deg, transparent 75%, #444 75%);
-            background-size: 20px 20px;
-            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
-            border-radius: 10px;
-            border: 2px solid rgba(255,255,255,0.2);
             image-rendering: pixelated;
             display: block;
             margin: 0 auto;
@@ -192,538 +261,537 @@
 
         .btn {
             width: 100%;
-            padding: 15px;
+            padding: 14px 24px;
+            background: var(--accent);
+            color: white;
             border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: bold;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            transition: background 0.2s;
+            margin-bottom: 12px;
         }
 
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(102,126,234,0.4); }
-
-        .btn-success {
-            background: linear-gradient(135deg, #00f260 0%, #0575e6 100%);
-            color: white;
-        }
-        .btn-success:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,242,96,0.4); }
-
-        .btn-warning {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            color: white;
+        .btn:hover {
+            background: var(--accent-hover);
         }
 
-        .btn-info {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            color: white;
+        .btn-secondary {
+            background: var(--surface-hover);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+
+        .btn-danger {
+            background: #dc2626;
+        }
+
+        .btn-danger:hover {
+            background: #b91c1c;
         }
 
         .ranks-list {
             max-height: 400px;
             overflow-y: auto;
-            background: rgba(0,0,0,0.2);
-            border-radius: 10px;
-            padding: 10px;
         }
 
         .rank-item {
             display: flex;
             align-items: center;
-            gap: 15px;
-            padding: 12px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 10px;
-            margin-bottom: 10px;
-            border: 2px solid transparent;
-            transition: all 0.3s;
+            gap: 16px;
+            padding: 16px;
+            background: var(--bg);
+            border-radius: 8px;
+            margin-bottom: 12px;
+            border: 1px solid var(--border);
         }
 
-        .rank-item:hover { border-color: rgba(255,255,255,0.2); }
         .rank-item img {
             width: 80px;
             height: 40px;
             object-fit: contain;
             image-rendering: pixelated;
-            background: rgba(0,0,0,0.3);
-            border-radius: 5px;
+            background: #0a0a0a;
         }
 
-        .rank-info { flex: 1; }
-        .rank-name { font-weight: bold; font-size: 1.1em; }
-        .rank-char { 
-            font-family: monospace; 
-            color: #00f260; 
-            font-size: 0.9em;
-            background: rgba(0,0,0,0.3);
-            padding: 2px 8px;
-            border-radius: 5px;
+        .rank-info {
+            flex: 1;
         }
-        .rank-meta { font-size: 0.8em; color: #888; margin-top: 4px; }
 
-        .delete-btn {
-            background: #ff416c;
-            border: none;
-            color: white;
-            padding: 8px 15px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
+        .rank-name {
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 4px;
+        }
+
+        .rank-char {
+            font-family: monospace;
+            font-size: 0.875rem;
+            color: var(--accent);
+        }
+
+        .rank-meta {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 4px;
         }
 
         .empty-state {
             text-align: center;
-            padding: 40px;
-            color: #666;
-            font-style: italic;
-        }
-
-        .file-input-wrapper {
-            position: relative;
-            overflow: hidden;
-            display: inline-block;
-            width: 100%;
-        }
-
-        .file-input-wrapper input[type=file] {
-            position: absolute;
-            left: -9999px;
-        }
-
-        .file-label {
-            display: block;
-            padding: 15px;
-            background: rgba(255,255,255,0.1);
-            border: 2px dashed rgba(255,255,255,0.3);
-            border-radius: 10px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .file-label:hover {
-            background: rgba(255,255,255,0.15);
-            border-color: #00f260;
+            padding: 60px 20px;
+            color: var(--text-muted);
         }
 
         .stats {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-bottom: 15px;
+            gap: 12px;
+            margin-bottom: 20px;
         }
 
-        .stat-box {
-            background: rgba(0,0,0,0.3);
-            padding: 15px;
-            border-radius: 10px;
+        .stat {
             text-align: center;
+            padding: 16px;
+            background: var(--bg);
+            border-radius: 8px;
         }
 
         .stat-value {
-            font-size: 2em;
-            font-weight: bold;
-            color: #00f260;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent);
         }
 
         .stat-label {
-            font-size: 0.8em;
-            color: #888;
-            margin-top: 5px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 4px;
         }
 
-        .checkbox-wrapper {
-            display: flex;
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 200;
             align-items: center;
-            gap: 10px;
-            margin: 15px 0;
-            padding: 15px;
-            background: rgba(0,0,0,0.2);
-            border-radius: 10px;
+            justify-content: center;
+            padding: 20px;
         }
 
-        input[type="checkbox"] {
-            width: 24px;
-            height: 24px;
-            cursor: pointer;
-        }
-
-        .auto-rank-input {
+        .modal.open {
             display: flex;
-            gap: 10px;
-            margin-bottom: 10px;
         }
 
-        .auto-rank-input input {
-            flex: 1;
+        .modal-content {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 500px;
+            width: 100%;
         }
 
-        .auto-rank-input button {
-            width: auto;
-            padding: 12px 20px;
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 16px;
         }
 
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 1s ease-in-out infinite;
+        .modal-text {
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 20px;
         }
 
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        .power2-badge {
-            display: inline-block;
-            background: #00f260;
-            color: black;
-            padding: 2px 8px;
-            border-radius: 5px;
-            font-size: 0.75em;
-            font-weight: bold;
-            margin-left: 10px;
+        .modal-close {
+            width: 100%;
+            padding: 12px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
         }
 
-        ::-webkit-scrollbar {
-            width: 10px;
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-muted);
+            font-size: 0.875rem;
         }
-        ::-webkit-scrollbar-track {
-            background: rgba(0,0,0,0.2);
-            border-radius: 5px;
+
+        .file-input {
+            display: none;
         }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(255,255,255,0.2);
-            border-radius: 5px;
+
+        .file-label {
+            display: block;
+            padding: 16px;
+            background: var(--bg);
+            border: 2px dashed var(--border);
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            color: var(--text-muted);
+            transition: all 0.2s;
         }
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(255,255,255,0.3);
+
+        .file-label:hover {
+            border-color: var(--accent);
+            color: var(--text);
+        }
+
+        .actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        @media (max-width: 600px) {
+            .actions {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h1>🎮 AUTO RANK GENERATOR PRO</h1>
-        <p>Generuj rangi Minecraft automatycznie z poprawnymi rozmiarami (potęga 2)</p>
+    <div class="lang-select">
+        <button class="lang-btn active" onclick="setLang('pl')">🇵🇱 PL</button>
+        <button class="lang-btn" onclick="setLang('en')">🇺🇸 EN</button>
     </div>
 
-    <div class="mode-tabs">
-        <button class="mode-tab active" onclick="setMode('manual')">✏️ Ręczny</button>
-        <button class="mode-tab" onclick="setMode('auto')">⚡ Automatyczny (Bulk)</button>
-    </div>
+    <div class="container">
+        <header>
+            <h1>vRankGenerator</h1>
+            <p class="subtitle" data-key="subtitle">Generator rang Minecraft z poprawnymi rozmiarami</p>
+        </header>
 
-    <div class="main-grid">
-        <!-- LEWY PANEL -->
-        <div class="panel">
-            <div class="panel-title">⚙️ Konfiguracja</div>
+        <div class="card">
+            <div class="card-title" data-key="config">Konfiguracja</div>
             
-            <div id="manualMode">
-                <div class="form-group">
-                    <label>Nazwa rangi:</label>
-                    <input type="text" id="rankName" placeholder="np. WŁAŚCICIEL" oninput="updatePreview()">
-                </div>
-            </div>
-
-            <div id="autoMode" style="display: none;">
-                <div class="form-group">
-                    <label>Szybkie dodawanie (jedna nazwa na linię):</label>
-                    <textarea id="bulkNames" rows="4" style="width: 100%; padding: 12px; background: rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.1); color: white; border-radius: 10px; resize: vertical;" placeholder="ADMIN&#10;MODERATOR&#10;HELPER"></textarea>
-                    <button class="btn btn-success" onclick="addBulkRanks()" style="margin-top: 10px;">➕ Dodaj wszystkie</button>
-                </div>
+            <div class="form-group">
+                <label data-key="rankName">Nazwa rangi</label>
+                <input type="text" id="rankName" placeholder="ADMIN" oninput="updatePreview()">
             </div>
 
             <div class="form-group">
-                <label>Czcionka:</label>
+                <label data-key="font">Czcionka</label>
                 <select id="fontStyle" onchange="updatePreview()">
-                    <option value="VT323">VT323 (Pixel Classic)</option>
-                    <option value="Press Start 2P">Press Start 2P (Retro)</option>
-                    <option value="Russo One">Russo One (Bold)</option>
-                    <option value="Black Ops One">Black Ops One (Military)</option>
-                    <option value="Bungee">Bungee (Urban)</option>
-                    <option value="Quantico">Quantico (Tech)</option>
+                    <option value="VT323">VT323</option>
+                    <option value="Press Start 2P">Press Start 2P</option>
+                    <option value="Russo One">Russo One</option>
+                    <option value="Black Ops One">Black Ops One</option>
+                    <option value="Bungee">Bungee</option>
+                    <option value="Quantico">Quantico</option>
                     <option value="Montserrat">Montserrat ExtraBold</option>
                 </select>
             </div>
 
             <div class="form-group">
-                <label>Styl kształtu:</label>
+                <label data-key="shape">Kształt</label>
                 <select id="shapeStyle" onchange="updatePreview()">
-                    <option value="chamfer">Ścięte rogi (Minecraft)</option>
-                    <option value="square">Prostokąt</option>
-                    <option value="rounded">Zaokrąglony</option>
+                    <option value="chamfer" data-key="chamfer">Ścięte rogi</option>
+                    <option value="square" data-key="square">Prostokąt</option>
+                    <option value="rounded" data-key="rounded">Zaokrąglony</option>
                 </select>
             </div>
 
-            <div class="form-group">
-                <label>Wybierz gradient:</label>
-                <div class="gradient-presets" id="gradientPresets"></div>
+            <div class="gradient-toggle" onclick="toggleGradients()">
+                <span data-key="gradients">Szablony gradientów</span>
+                <span id="arrow">▼</span>
             </div>
+            
+            <div class="gradient-panel" id="gradientPanel"></div>
 
             <div class="form-group">
-                <label>Kolory (ręczna edycja):</label>
+                <label data-key="colors">Kolory</label>
                 <div class="color-row">
-                    <input type="color" id="color1" value="#ff0000" oninput="updatePreview()">
-                    <input type="color" id="color2" value="#ff8800" oninput="updatePreview()">
+                    <input type="color" id="color1" value="#3b82f6" oninput="updatePreview()">
+                    <input type="color" id="color2" value="#8b5cf6" oninput="updatePreview()">
                 </div>
             </div>
 
             <div class="form-group">
-                <label>Kolor tekstu:</label>
-                <input type="color" id="textColor" value="#ffffff" oninput="updatePreview()" style="width: 60px; height: 40px;">
+                <label data-key="textColor">Kolor tekstu</label>
+                <input type="color" id="textColor" value="#ffffff" oninput="updatePreview()" style="width: 60px; height: 44px;">
             </div>
 
             <div class="checkbox-wrapper">
                 <input type="checkbox" id="power2Check" checked onchange="updatePreview()">
-                <label for="power2Check" style="margin: 0; cursor: pointer;">
-                    Wymuś rozmiar potęgi 2 (dla Minecraft 1.21+) <span class="power2-badge">ZALECANE</span>
+                <label for="power2Check">
+                    <span data-key="power2">Wymuś rozmiar potęgi 2 (dla Minecraft 1.21+)</span>
+                    <button class="help-btn" onclick="showHelp(event)">?</button>
                 </label>
             </div>
 
-            <div class="form-group" id="previewBox">
-                <label>Podgląd (skalowany do 128x32 dla MC):</label>
-                <canvas id="previewCanvas" class="preview-canvas"></canvas>
+            <div class="preview-box">
+                <canvas id="previewCanvas"></canvas>
             </div>
 
-            <button class="btn btn-success" onclick="addCurrentRank()">💾 Dodaj rangę do listy</button>
+            <button class="btn" onclick="addRank()" data-key="addRank">Dodaj rangę</button>
             
-            <div class="file-input-wrapper" style="margin-top: 10px;">
-                <input type="file" id="mgfLoad" accept=".mgf,.json" onchange="loadMGF(event)">
-                <label for="mgfLoad" class="file-label">📂 Wczytaj .mgf / .json</label>
-            </div>
+            <input type="file" id="mgfLoad" class="file-input" accept=".mgf,.json" onchange="loadMGF(event)">
+            <label for="mgfLoad" class="file-label" data-key="loadMGF">Wczytaj .mgf</label>
         </div>
 
-        <!-- PRAWY PANEL -->
-        <div class="panel">
-            <div class="panel-title">📋 Lista Rang <span id="rankCount" style="color: #888; font-size: 0.8em;">(0/44)</span></div>
+        <div class="card">
+            <div class="card-title" data-key="list">Lista rang</div>
             
             <div class="stats">
-                <div class="stat-box">
+                <div class="stat">
                     <div class="stat-value" id="statCount">0</div>
-                    <div class="stat-label">Rangi</div>
+                    <div class="stat-label" data-key="ranks">Rangi</div>
                 </div>
-                <div class="stat-box">
-                    <div class="stat-value" id="statChars">64</div>
-                    <div class="stat-label">Dostępne</div>
+                <div class="stat">
+                    <div class="stat-value" id="statSlots">64</div>
+                    <div class="stat-label" data-key="slots">Sloty</div>
                 </div>
-                <div class="stat-box">
+                <div class="stat">
                     <div class="stat-value" id="statSize">-</div>
-                    <div class="stat-label">Rozmiar</div>
+                    <div class="stat-label">Size</div>
                 </div>
             </div>
 
             <div class="ranks-list" id="ranksList">
-                <div class="empty-state">Brak rang. Dodaj pierwszą!</div>
+                <div class="empty-state" data-key="empty">Brak rang. Dodaj pierwszą!</div>
             </div>
 
-            <div style="margin-top: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                <button class="btn btn-warning" onclick="saveMGF()">💾 Zapisz .mgf</button>
-                <button class="btn btn-info" onclick="generateTexturePack()">📦 Generuj TexturePack</button>
+            <div class="actions" style="margin-top: 20px;">
+                <button class="btn btn-secondary" onclick="saveMGF()" data-key="saveMGF">Zapisz .mgf</button>
+                <button class="btn" onclick="generatePack()" data-key="generatePack">Generuj TexturePack</button>
             </div>
-            
-            <button class="btn btn-primary" onclick="downloadAllImages()" style="margin-top: 10px;">🖼️ Pobierz same PNG</button>
         </div>
     </div>
 
-    <script>
-        // UNICODE CHARACTERS - 64 slots ( to )
-        const UNICODE_CHARS = [
-            "","","","","","","","","","","","","","","","",
-            "","","","","","","","","","","","","","","","",
-            "","","","","","","","","","","","","","","","",
-            "","","","","","","","","","","","","","","",""
-        ];
+    <div class="modal" id="helpModal" onclick="closeModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-title" data-key="helpTitle">Rozmiar potęgi 2</div>
+            <div class="modal-text" data-key="helpText">
+                Minecraft 1.21+ wymaga, aby tekstury miały rozmiar będący potęgą liczby 2 
+                (np. 64x32, 128x32, 256x32). Ta opcja automatycznie dopasowuje szerokość 
+                rangi do najbliższej poprawnej wartości.
+            </div>
+            <button class="modal-close" onclick="closeModal()" data-key="close">Zamknij</button>
+        </div>
+    </div>
 
-        // FILE NAMES mapping (first 32 are reserved, 32-44 are new from image)
-        const FILE_NAMES = [
-            "member-seav","media-seav","manager-seav","helper-seav","mvp-seav","mvpplus-seav","mvpplusplus-seav",
-            "mod-seav","noob-seav","owner-seav","admin-seav","pro-seav","twitch-seav","og-seav","builder-seav",
-            "vip-seav","vipplus-seav","dev-seav","designer-seav","god-seav","elite-seav","eliteplus-seav",
-            "youtube-seav","broadcast-seav","partner-seav","npc-seav","twitchbyrg","vipbyrg","vipplusbyrg",
-            "yellowbyrg","youtubebyrg","memberbyrg",
-            // NEW ONES FROM IMAGE (32-44)
-            "admin","chatmod","chill","elita","gracz","helper","moderator","owner","pomocnik","sponsor","technik","testhelper","vip",
-            // NULL placeholders (45-63)
-            "null","null","null","null","null","null","null","null","null","null",
-            "null","null","null","null","null","null","null","null","null"
-        ];
+    <footer>
+        vProLabs &copy; 2024
+    </footer>
+
+    <script>
+        const TRANSLATIONS = {
+            pl: {
+                subtitle: "Generator rang Minecraft z poprawnymi rozmiarami",
+                config: "Konfiguracja",
+                rankName: "Nazwa rangi",
+                font: "Czcionka",
+                shape: "Kształt",
+                chamfer: "Ścięte rogi",
+                square: "Prostokąt",
+                rounded: "Zaokrąglony",
+                gradients: "Szablony gradientów",
+                colors: "Kolory",
+                textColor: "Kolor tekstu",
+                power2: "Wymuś rozmiar potęgi 2 (dla Minecraft 1.21+)",
+                addRank: "Dodaj rangę",
+                loadMGF: "Wczytaj .mgf",
+                list: "Lista rang",
+                ranks: "Rangi",
+                slots: "Sloty",
+                empty: "Brak rang. Dodaj pierwszą!",
+                saveMGF: "Zapisz .mgf",
+                generatePack: "Generuj TexturePack",
+                helpTitle: "Rozmiar potęgi 2",
+                helpText: "Minecraft 1.21+ wymaga, aby tekstury miały rozmiar będący potęgą liczby 2 (np. 64x32, 128x32, 256x32). Ta opcja automatycznie dopasowuje szerokość rangi do najbliższej poprawnej wartości.",
+                close: "Zamknij"
+            },
+            en: {
+                subtitle: "Minecraft rank generator with correct sizes",
+                config: "Configuration",
+                rankName: "Rank name",
+                font: "Font",
+                shape: "Shape",
+                chamfer: "Chamfered",
+                square: "Square",
+                rounded: "Rounded",
+                gradients: "Gradient templates",
+                colors: "Colors",
+                textColor: "Text color",
+                power2: "Enforce power of 2 size (for Minecraft 1.21+)",
+                addRank: "Add rank",
+                loadMGF: "Load .mgf",
+                list: "Rank list",
+                ranks: "Ranks",
+                slots: "Slots",
+                empty: "No ranks. Add first one!",
+                saveMGF: "Save .mgf",
+                generatePack: "Generate TexturePack",
+                helpTitle: "Power of 2 size",
+                helpText: "Minecraft 1.21+ requires textures to have power of 2 dimensions (e.g. 64x32, 128x32, 256x32). This option automatically adjusts rank width to the nearest valid value.",
+                close: "Close"
+            }
+        };
 
         const GRADIENTS = [
-            {name: "Fire", c1: "#ff0000", c2: "#ff8800"},
-            {name: "Ocean", c1: "#0066ff", c2: "#00ccff"},
-            {name: "Forest", c1: "#228b22", c2: "#90ee90"},
-            {name: "Purple", c1: "#667eea", c2: "#764ba2"},
-            {name: "Sunset", c1: "#ff512f", c2: "#dd2476"},
-            {name: "Gold", c1: "#ffd700", c2: "#ff8c00"},
-            {name: "Ice", c1: "#00c6ff", c2: "#0072ff"},
-            {name: "Magma", c1: "#ff416c", c2: "#ff4b2b"},
-            {name: "Neon", c1: "#b3ffab", c2: "#12fff7"},
-            {name: "Berry", c1: "#8e2de2", c2: "#4a00e0"},
-            {name: "Citrus", c1: "#f12711", c2: "#f5af19"},
-            {name: "Midnight", c1: "#232526", c2: "#414345"},
-            {name: "Candy", c1: "#ff9a9e", c2: "#fecfef"},
-            {name: "Rainbow", c1: "#ff0080", c2: "#40e0d0"},
-            {name: "Blood", c1: "#8a0000", c2: "#ff0000"},
-            {name: "Toxic", c1: "#a8e063", c2: "#56ab2f"},
-            {name: "Royal", c1: "#141e30", c2: "#243b55"},
-            {name: "Peach", c1: "#ffecd2", c2: "#fcb69f"},
-            {name: "Cosmic", c1: "#20002c", c2: "#cbb4d4"},
-            {name: "Lemon", c1: "#ffe259", c2: "#ffa751"}
+            {name: "Blue", c1: "#3b82f6", c2: "#8b5cf6"},
+            {name: "Fire", c1: "#ef4444", c2: "#f97316"},
+            {name: "Forest", c1: "#22c55e", c2: "#16a34a"},
+            {name: "Gold", c1: "#eab308", c2: "#ca8a04"},
+            {name: "Pink", c1: "#ec4899", c2: "#d946ef"},
+            {name: "Cyan", c1: "#06b6d4", c2: "#3b82f6"},
+            {name: "Purple", c1: "#8b5cf6", c2: "#a855f7"},
+            {name: "Red", c1: "#dc2626", c2: "#991b1b"},
+            {name: "Orange", c1: "#f97316", c2: "#ea580c"},
+            {name: "Teal", c1: "#14b8a6", c2: "#0d9488"},
+            {name: "Indigo", c1: "#6366f1", c2: "#4f46e5"},
+            {name: "Rose", c1: "#f43f5e", c2: "#e11d48"},
+            {name: "Amber", c1: "#f59e0b", c2: "#d97706"},
+            {name: "Emerald", c1: "#10b981", c2: "#059669"},
+            {name: "Sky", c1: "#0ea5e9", c2: "#0284c7"}
         ];
 
+        const UNICODE_CHARS = Array.from({length: 64}, (_, i) => String.fromCharCode(0xE800 + i));
+        
         let ranks = [];
-        let currentGradient = GRADIENTS[0];
-        let currentMode = 'manual';
+        let currentLang = 'pl';
+        let gradientsOpen = false;
 
-        // Load fonts
         Promise.all([
-            document.fonts.load('30px "VT323"'),
-            document.fonts.load('30px "Press Start 2P"'),
-            document.fonts.load('30px "Russo One"'),
-            document.fonts.load('30px "Black Ops One"'),
-            document.fonts.load('30px "Bungee"'),
-            document.fonts.load('30px "Quantico"'),
-            document.fonts.load('30px "Montserrat"')
+            document.fonts.load('24px "VT323"'),
+            document.fonts.load('24px "Press Start 2P"'),
+            document.fonts.load('24px "Russo One"'),
+            document.fonts.load('24px "Black Ops One"'),
+            document.fonts.load('24px "Bungee"'),
+            document.fonts.load('24px "Quantico"'),
+            document.fonts.load('24px "Montserrat"')
         ]).then(() => {
-            initPresets();
+            initGradients();
             updatePreview();
         });
 
-        function initPresets() {
-            const container = document.getElementById('gradientPresets');
+        function setLang(lang) {
+            currentLang = lang;
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.textContent.includes(lang.toUpperCase()));
+            });
+            
+            document.querySelectorAll('[data-key]').forEach(el => {
+                const key = el.getAttribute('data-key');
+                if (TRANSLATIONS[lang][key]) {
+                    el.textContent = TRANSLATIONS[lang][key];
+                }
+            });
+        }
+
+        function initGradients() {
+            const panel = document.getElementById('gradientPanel');
             GRADIENTS.forEach((g, i) => {
                 const btn = document.createElement('div');
                 btn.className = 'preset-btn';
-                btn.style.background = `linear-gradient(135deg, ${g.c1} 0%, ${g.c2} 100%)`;
-                btn.title = g.name;
-                btn.onclick = () => selectGradient(i);
-                container.appendChild(btn);
+                btn.style.background = `linear-gradient(135deg, ${g.c1}, ${g.c2})`;
+                btn.onclick = () => selectGradient(i, btn);
+                if (i === 0) btn.classList.add('active');
+                panel.appendChild(btn);
             });
-            selectGradient(0);
+            selectGradient(0, panel.children[0]);
         }
 
-        function selectGradient(index) {
-            currentGradient = GRADIENTS[index];
-            document.getElementById('color1').value = currentGradient.c1;
-            document.getElementById('color2').value = currentGradient.c2;
-            document.querySelectorAll('.preset-btn').forEach((b, i) => {
-                b.classList.toggle('active', i === index);
-            });
+        function toggleGradients() {
+            gradientsOpen = !gradientsOpen;
+            document.getElementById('gradientPanel').classList.toggle('open', gradientsOpen);
+            document.getElementById('arrow').textContent = gradientsOpen ? '▲' : '▼';
+        }
+
+        function selectGradient(index, btn) {
+            const g = GRADIENTS[index];
+            document.getElementById('color1').value = g.c1;
+            document.getElementById('color2').value = g.c2;
+            document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
             updatePreview();
         }
 
-        function setMode(mode) {
-            currentMode = mode;
-            document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
-            event.target.classList.add('active');
-            document.getElementById('manualMode').style.display = mode === 'manual' ? 'block' : 'none';
-            document.getElementById('autoMode').style.display = mode === 'auto' ? 'block' : 'none';
+        function getPower2Width(textWidth) {
+            const padding = 24;
+            const width = textWidth + padding * 2;
+            const sizes = [64, 128, 256, 512];
+            for (let s of sizes) if (width <= s) return s;
+            return 512;
         }
 
-        function getPowerOf2Size(textWidth) {
-            const padding = 20;
-            const height = 32; // Fixed height for MC
-            let width = textWidth + (padding * 2);
-            
-            // Round up to nearest power of 2
-            const powers = [64, 128, 256, 512];
-            for (let p of powers) {
-                if (width <= p) return { width: p, height };
-            }
-            return { width: 512, height };
-        }
-
-        function drawRankToCanvas(canvas, text, options = {}) {
+        function drawCanvas(canvas, text, opts) {
             const ctx = canvas.getContext('2d');
-            const fontStyle = options.font || 'VT323';
-            const shape = options.shape || 'chamfer';
-            const color1 = options.c1 || '#ff0000';
-            const color2 = options.c2 || '#ff8800';
-            const textColor = options.textColor || '#ffffff';
-            const forcePower2 = options.power2 !== false;
-
-            let fontSize = 24;
-            if (fontStyle === 'Press Start 2P') fontSize = 14;
-            else if (fontStyle === 'Montserrat') fontSize = 20;
-
-            ctx.font = `bold ${fontSize}px "${fontStyle}"`;
-            const textMetrics = ctx.measureText(text);
+            const font = opts.font || 'VT323';
+            let size = font === 'Press Start 2P' ? 14 : font === 'Montserrat' ? 20 : 22;
             
-            let width, height;
-            if (forcePower2) {
-                const size = getPowerOf2Size(textMetrics.width);
-                width = size.width;
-                height = size.height;
+            ctx.font = `bold ${size}px "${font}"`;
+            const metrics = ctx.measureText(text);
+            
+            let w, h = 32;
+            if (opts.power2) {
+                w = getPower2Width(metrics.width);
             } else {
-                width = textMetrics.width + 40;
-                height = 32;
+                w = metrics.width + 48;
             }
-
-            canvas.width = width;
-            canvas.height = height;
-
-            // Redraw with correct size
-            ctx.font = `bold ${fontSize}px "${fontStyle}"`;
+            
+            canvas.width = w;
+            canvas.height = h;
+            
+            ctx.font = `bold ${size}px "${font}"`;
             ctx.textBaseline = 'middle';
             ctx.textAlign = 'center';
-
-            // Background gradient
-            const grad = ctx.createLinearGradient(0, 0, width, 0);
-            grad.addColorStop(0, color1);
-            grad.addColorStop(1, color2);
+            
+            const grad = ctx.createLinearGradient(0, 0, w, 0);
+            grad.addColorStop(0, opts.c1);
+            grad.addColorStop(1, opts.c2);
             ctx.fillStyle = grad;
-
-            // Shape
-            if (shape === 'chamfer') {
-                const cut = Math.min(6, height/4);
+            
+            if (opts.shape === 'chamfer') {
+                const c = 6;
                 ctx.beginPath();
-                ctx.moveTo(cut, 0);
-                ctx.lineTo(width - cut, 0);
-                ctx.lineTo(width, cut);
-                ctx.lineTo(width, height - cut);
-                ctx.lineTo(width - cut, height);
-                ctx.lineTo(cut, height);
-                ctx.lineTo(0, height - cut);
-                ctx.lineTo(0, cut);
+                ctx.moveTo(c, 0);
+                ctx.lineTo(w-c, 0);
+                ctx.lineTo(w, c);
+                ctx.lineTo(w, h-c);
+                ctx.lineTo(w-c, h);
+                ctx.lineTo(c, h);
+                ctx.lineTo(0, h-c);
+                ctx.lineTo(0, c);
                 ctx.closePath();
                 ctx.fill();
-                ctx.strokeStyle = "rgba(0,0,0,0.4)";
+                ctx.strokeStyle = 'rgba(0,0,0,0.3)';
                 ctx.lineWidth = 2;
                 ctx.stroke();
-            } else if (shape === 'rounded') {
+            } else if (opts.shape === 'rounded') {
                 ctx.beginPath();
-                ctx.roundRect(0, 0, width, height, 8);
+                ctx.roundRect(0, 0, w, h, 8);
                 ctx.fill();
             } else {
-                ctx.fillRect(0, 0, width, height);
-                ctx.strokeStyle = "rgba(255,255,255,0.2)";
-                ctx.lineWidth = 2;
-                ctx.strokeRect(2, 2, width-4, height-4);
+                ctx.fillRect(0, 0, w, h);
             }
-
-            // Text shadow
-            ctx.fillStyle = "rgba(0,0,0,0.8)";
-            ctx.fillText(text, (width/2) + 1, (height/2) + 1);
-
-            // Main text
-            ctx.fillStyle = textColor;
-            ctx.fillText(text, width/2, height/2);
-
-            return { width, height };
+            
+            ctx.fillStyle = 'rgba(0,0,0,0.6)';
+            ctx.fillText(text, w/2 + 1, h/2 + 1);
+            ctx.fillStyle = opts.textColor;
+            ctx.fillText(text, w/2, h/2);
+            
+            return {w, h};
         }
 
         function updatePreview() {
-            const canvas = document.getElementById('previewCanvas');
-            const text = document.getElementById('rankName').value || 'PREVIEW';
-            const size = drawRankToCanvas(canvas, text.toUpperCase(), {
+            const c = document.getElementById('previewCanvas');
+            const size = drawCanvas(c, (document.getElementById('rankName').value || 'PREVIEW').toUpperCase(), {
                 font: document.getElementById('fontStyle').value,
                 shape: document.getElementById('shapeStyle').value,
                 c1: document.getElementById('color1').value,
@@ -731,35 +799,16 @@
                 textColor: document.getElementById('textColor').value,
                 power2: document.getElementById('power2Check').checked
             });
-            document.getElementById('statSize').textContent = `${size.width}x${size.height}`;
+            document.getElementById('statSize').textContent = `${size.w}x${size.h}`;
         }
 
-        function addCurrentRank() {
+        function addRank() {
             const name = document.getElementById('rankName').value.trim();
-            if (!name) {
-                alert('Wpisz nazwę rangi!');
-                return;
-            }
-            addRank(name);
-            document.getElementById('rankName').value = '';
-            updatePreview();
-        }
-
-        function addBulkRanks() {
-            const text = document.getElementById('bulkNames').value;
-            const names = text.split('\n').map(n => n.trim()).filter(n => n);
-            names.forEach(name => addRank(name));
-            document.getElementById('bulkNames').value = '';
-        }
-
-        function addRank(name) {
-            if (ranks.length >= 44) {
-                alert('Osiągnięto limit 44 rang (tyle masz slotów w JSON)!');
-                return;
-            }
-
+            if (!name) return alert(currentLang === 'pl' ? 'Wpisz nazwę!' : 'Enter name!');
+            if (ranks.length >= 64) return alert(currentLang === 'pl' ? 'Limit 64 rang!' : '64 ranks limit!');
+            
             const canvas = document.createElement('canvas');
-            const size = drawRankToCanvas(canvas, name.toUpperCase(), {
+            const size = drawCanvas(canvas, name.toUpperCase(), {
                 font: document.getElementById('fontStyle').value,
                 shape: document.getElementById('shapeStyle').value,
                 c1: document.getElementById('color1').value,
@@ -767,204 +816,164 @@
                 textColor: document.getElementById('textColor').value,
                 power2: true
             });
-
-            const rank = {
+            
+            ranks.push({
                 id: Date.now(),
                 name: name.toUpperCase(),
-                displayName: name,
+                display: name,
+                char: UNICODE_CHARS[ranks.length],
                 dataUrl: canvas.toDataURL('image/png'),
-                width: size.width,
-                height: size.height,
+                w: size.w,
+                h: size.h,
                 settings: {
                     font: document.getElementById('fontStyle').value,
                     shape: document.getElementById('shapeStyle').value,
                     c1: document.getElementById('color1').value,
                     c2: document.getElementById('color2').value,
                     textColor: document.getElementById('textColor').value
-                },
-                char: UNICODE_CHARS[ranks.length],
-                fileName: FILE_NAMES[ranks.length] || 'null'
-            };
-
-            ranks.push(rank);
-            renderRanks();
+                }
+            });
+            
+            document.getElementById('rankName').value = '';
+            render();
+            updatePreview();
         }
 
-        function renderRanks() {
+        function render() {
             const list = document.getElementById('ranksList');
-            document.getElementById('rankCount').textContent = `(${ranks.length}/44)`;
             document.getElementById('statCount').textContent = ranks.length;
-            document.getElementById('statChars').textContent = 64 - ranks.length;
-
+            document.getElementById('statSlots').textContent = 64 - ranks.length;
+            
             if (ranks.length === 0) {
-                list.innerHTML = '<div class="empty-state">Brak rang. Dodaj pierwszą!</div>';
+                list.innerHTML = `<div class="empty-state">${TRANSLATIONS[currentLang].empty}</div>`;
                 return;
             }
-
+            
             list.innerHTML = ranks.map((r, i) => `
                 <div class="rank-item">
-                    <img src="${r.dataUrl}" alt="${r.name}">
+                    <img src="${r.dataUrl}">
                     <div class="rank-info">
-                        <div class="rank-name">${r.displayName}</div>
-                        <div class="rank-char">${r.char} → ${r.fileName}.png</div>
-                        <div class="rank-meta">${r.settings.font} • ${r.width}x${r.height}</div>
+                        <div class="rank-name">${r.display}</div>
+                        <div class="rank-char">${r.char}</div>
+                        <div class="rank-meta">${r.settings.font} • ${r.w}x${r.h}</div>
                     </div>
-                    <button class="delete-btn" onclick="deleteRank(${r.id})">🗑️</button>
+                    <button class="btn btn-danger" style="width: auto; padding: 8px 16px;" onclick="deleteRank(${r.id})">×</button>
                 </div>
             `).join('');
         }
 
         function deleteRank(id) {
             ranks = ranks.filter(r => r.id !== id);
-            // Reassign chars and filenames
-            ranks.forEach((r, i) => {
-                r.char = UNICODE_CHARS[i];
-                r.fileName = FILE_NAMES[i] || 'null';
-            });
-            renderRanks();
+            ranks.forEach((r, i) => r.char = UNICODE_CHARS[i]);
+            render();
         }
 
         function saveMGF() {
-            if (ranks.length === 0) {
-                alert('Brak rang do zapisania!');
-                return;
-            }
-            
-            const mgfData = {
+            if (!ranks.length) return;
+            const data = {
                 version: "2.0",
-                generator: "AutoRankPro",
-                created: new Date().toISOString(),
-                ranks: ranks.map(r => ({
-                    name: r.displayName,
-                    settings: r.settings
-                }))
+                tool: "vRankGenerator",
+                date: new Date().toISOString(),
+                ranks: ranks.map(r => ({name: r.display, settings: r.settings}))
             };
-
-            const blob = new Blob([JSON.stringify(mgfData, null, 2)], {type: 'application/json'});
+            const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `ranks-config-${ranks.length}.mgf`;
+            a.download = `ranks-${ranks.length}.mgf`;
             a.click();
             URL.revokeObjectURL(url);
         }
 
-        function loadMGF(event) {
-            const file = event.target.files[0];
+        function loadMGF(e) {
+            const file = e.target.files[0];
             if (!file) return;
-
             const reader = new FileReader();
-            reader.onload = (e) => {
+            reader.onload = ev => {
                 try {
-                    const data = JSON.parse(e.target.result);
-                    
-                    if (data.ranks && Array.isArray(data.ranks)) {
-                        // Clear current
-                        ranks = [];
-                        
-                        // Load each rank
-                        data.ranks.forEach(r => {
-                            if (r.settings) {
-                                document.getElementById('fontStyle').value = r.settings.font || 'VT323';
-                                document.getElementById('shapeStyle').value = r.settings.shape || 'chamfer';
-                                document.getElementById('color1').value = r.settings.c1 || '#ff0000';
-                                document.getElementById('color2').value = r.settings.c2 || '#ff8800';
-                                document.getElementById('textColor').value = r.settings.textColor || '#ffffff';
-                            }
-                            addRank(r.name);
+                    const data = JSON.parse(ev.target.result);
+                    ranks = [];
+                    data.ranks.forEach(r => {
+                        document.getElementById('fontStyle').value = r.settings.font;
+                        document.getElementById('shapeStyle').value = r.settings.shape;
+                        document.getElementById('color1').value = r.settings.c1;
+                        document.getElementById('color2').value = r.settings.c2;
+                        document.getElementById('textColor').value = r.settings.textColor;
+                        const canvas = document.createElement('canvas');
+                        const size = drawCanvas(canvas, r.name.toUpperCase(), {...r.settings, power2: true});
+                        ranks.push({
+                            id: Date.now() + Math.random(),
+                            name: r.name.toUpperCase(),
+                            display: r.name,
+                            char: UNICODE_CHARS[ranks.length],
+                            dataUrl: canvas.toDataURL('image/png'),
+                            w: size.w,
+                            h: size.h,
+                            settings: r.settings
                         });
-                        
-                        alert(`Wczytano ${data.ranks.length} rang!`);
-                    } else {
-                        alert('Nieprawidłowy format pliku MGF!');
-                    }
-                } catch (err) {
-                    alert('Błąd wczytywania: ' + err.message);
+                    });
+                    render();
+                    alert(`Loaded ${ranks.length} ranks!`);
+                } catch(err) {
+                    alert('Error loading file!');
                 }
             };
             reader.readAsText(file);
         }
 
-        async function generateTexturePack() {
-            if (ranks.length === 0) {
-                alert('Brak rang do wygenerowania!');
-                return;
-            }
-
-            const zip = new JSZip();
+        async function generatePack() {
+            if (!ranks.length) return;
             
-            // Create folder structure
+            const zip = new JSZip();
             const assets = zip.folder("assets").folder("minecraft");
             const textures = assets.folder("textures").folder("ranks");
             const font = assets.folder("font");
-
-            // Generate JSON providers
-            const providers = ranks.map((r, i) => ({
+            
+            // Only used chars - NO NULL ENTRIES
+            const providers = ranks.map(r => ({
                 type: "bitmap",
-                file: `minecraft:ranks/${r.fileName}.png`,
+                file: `minecraft:ranks/${r.display.toLowerCase().replace(/[^a-z0-9]/g, '_')}.png`,
                 ascent: 7,
                 height: 7,
                 chars: [r.char]
             }));
-
-            // Fill remaining slots with null
-            for (let i = ranks.length; i < 64; i++) {
-                providers.push({
-                    type: "bitmap",
-                    file: "minecraft:ranks/null.png",
-                    ascent: 7,
-                    height: 7,
-                    chars: [UNICODE_CHARS[i]]
-                });
-            }
-
-            const fontJson = { providers };
-            font.file("default.json", JSON.stringify(fontJson, null, 4));
-
-            // Add images
+            
+            font.file("default.json", JSON.stringify({providers}, null, 4));
+            
+            // chars.txt
+            const charsTxt = ranks.map(r => `${r.display} - "${r.char}"`).join('\n');
+            zip.file("chars.txt", charsTxt);
+            
+            // Images
             ranks.forEach(r => {
                 const base64 = r.dataUrl.split(',')[1];
-                textures.file(`${r.fileName}.png`, base64, {base64: true});
+                textures.file(`${r.display.toLowerCase().replace(/[^a-z0-9]/g, '_')}.png`, base64, {base64: true});
             });
-
-            // Add null.png (1x1 transparent)
-            const nullPng = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==";
-            textures.file("null.png", nullPng, {base64: true});
-
+            
             // pack.mcmeta
-            const mcmeta = {
-                pack: {
-                    pack_format: 46,
-                    description: "    §b§lChill§f§lBlock - Auto Generated Ranks"
-                }
-            };
-            zip.file("pack.mcmeta", JSON.stringify(mcmeta, null, 4));
-
-            // Generate ZIP
-            const content = await zip.generateAsync({type: "blob"});
-            const url = URL.createObjectURL(content);
+            zip.file("pack.mcmeta", JSON.stringify({
+                pack: {pack_format: 46, description: "    §b§lvRankGenerator§f§l by vProLabs"}
+            }, null, 4));
+            
+            const blob = await zip.generateAsync({type: "blob"});
+            const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `ChillBlock-Ranks-${ranks.length}.zip`;
+            a.download = `vRankGenerator-Pack-${ranks.length}.zip`;
             a.click();
             URL.revokeObjectURL(url);
         }
 
-        function downloadAllImages() {
-            if (ranks.length === 0) return;
-            
-            ranks.forEach((r, i) => {
-                setTimeout(() => {
-                    const a = document.createElement('a');
-                    a.href = r.dataUrl;
-                    a.download = `${r.fileName}.png`;
-                    a.click();
-                }, i * 100);
-            });
+        function showHelp(e) {
+            e.preventDefault();
+            document.getElementById('helpModal').classList.add('open');
         }
 
-        // Init
-        updatePreview();
+        function closeModal(e) {
+            if (!e || e.target.id === 'helpModal' || e.target.classList.contains('modal-close')) {
+                document.getElementById('helpModal').classList.remove('open');
+            }
+        }
     </script>
 </body>
 </html>
