@@ -2,182 +2,591 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generator Rang Minecraft</title>
-    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Generator Rang Minecraft - Multi Mode</title>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Press+Start+2P&family=Russo+One&family=Black+Ops+One&family=Bungee&family=Quantico:wght@700&family=Montserrat:wght@800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #222;
+            background-color: #1a1a1a;
             color: white;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-        }
-        h1 { margin-bottom: 10px; }
-        
-        .container {
-            background-color: #333;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            width: 350px;
+            margin: 0;
+            padding: 10px;
+            min-height: 100vh;
         }
 
-        label { font-size: 0.9em; color: #ccc; }
-        
+        h1 { 
+            margin: 0 0 15px 0; 
+            font-size: 1.5em;
+            text-align: center;
+        }
+
+        .main-layout {
+            display: flex;
+            gap: 15px;
+            max-width: 1200px;
+            margin: 0 auto;
+            flex-direction: column;
+        }
+
+        @media (min-width: 768px) {
+            .main-layout {
+                flex-direction: row;
+            }
+        }
+
+        .left-panel, .right-panel {
+            background-color: #2a2a2a;
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+
+        .left-panel {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .right-panel {
+            width: 100%;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        @media (min-width: 768px) {
+            .right-panel {
+                width: 320px;
+                max-height: 80vh;
+            }
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label { 
+            display: block;
+            font-size: 0.85em; 
+            color: #aaa; 
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
         input[type="text"], select {
             width: 100%;
-            padding: 8px;
-            background: #444;
-            border: 1px solid #555;
+            padding: 12px;
+            background: #3a3a3a;
+            border: 2px solid #4a4a4a;
             color: white;
-            border-radius: 4px;
-            box-sizing: border-box; /* Ważne dla paddingu */
+            border-radius: 8px;
+            font-size: 16px; /* Zapobiega zoomowi na iOS */
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus, select:focus {
+            outline: none;
+            border-color: #4CAF50;
         }
 
         .color-row {
             display: flex;
             gap: 10px;
             align-items: center;
+            flex-wrap: wrap;
         }
-        
+
         input[type="color"] {
             border: none;
             width: 50px;
-            height: 30px;
+            height: 40px;
             cursor: pointer;
             background: none;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .gradient-presets {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        @media (max-width: 480px) {
+            .gradient-presets {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .preset-btn {
+            height: 40px;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s, border-color 0.2s;
+            position: relative;
+        }
+
+        .preset-btn:hover, .preset-btn.active {
+            transform: scale(1.05);
+            border-color: white;
+        }
+
+        .preset-btn.active::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 20px;
+            text-shadow: 0 0 3px black;
         }
 
         canvas {
-            margin-top: 20px;
-            background-image: linear-gradient(45deg, #ccc 25%, transparent 25%), 
-                              linear-gradient(-45deg, #ccc 25%, transparent 25%), 
-                              linear-gradient(45deg, transparent 75%, #ccc 75%), 
-                              linear-gradient(-45deg, transparent 75%, #ccc 75%);
+            max-width: 100%;
+            height: auto;
+            background-image: 
+                linear-gradient(45deg, #666 25%, transparent 25%), 
+                linear-gradient(-45deg, #666 25%, transparent 25%), 
+                linear-gradient(45deg, transparent 75%, #666 75%), 
+                linear-gradient(-45deg, transparent 75%, #666 75%);
             background-size: 20px 20px;
             background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
             border: 2px solid #555;
-            image-rendering: pixelated; /* Kluczowe dla stylu pixel art */
-        }
-
-        .btn-download {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px;
-            text-align: center;
-            text-decoration: none;
-            border-radius: 5px;
-            margin-top: 10px;
-            cursor: pointer;
-            font-weight: bold;
+            image-rendering: pixelated;
+            border-radius: 4px;
             display: block;
+            margin: 0 auto;
         }
-        .btn-download:hover { background-color: #45a049; }
 
         .preview-box {
             text-align: center;
-            padding: 10px;
+            padding: 15px;
             background: #1a1a1a;
-            border-radius: 5px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 10px;
+            touch-action: manipulation;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+            color: white;
+            padding: 10px;
+            font-size: 14px;
+        }
+
+        .saved-item {
+            background: #3a3a3a;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: 2px solid #4a4a4a;
+            transition: border-color 0.2s;
+        }
+
+        .saved-item:hover {
+            border-color: #667eea;
+        }
+
+        .saved-item img {
+            width: 60px;
+            height: 30px;
+            object-fit: contain;
+            background: #222;
+            border-radius: 4px;
+            image-rendering: pixelated;
+        }
+
+        .saved-item-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .saved-item-name {
+            font-weight: bold;
+            font-size: 0.9em;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .saved-item-meta {
+            font-size: 0.75em;
+            color: #888;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #666;
+            padding: 40px 20px;
+            font-style: italic;
+        }
+
+        .zip-section {
+            position: sticky;
+            bottom: 0;
+            background: #2a2a2a;
+            padding-top: 15px;
+            border-top: 2px solid #4a4a4a;
+            margin-top: 10px;
+        }
+
+        .counter {
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 0.9em;
+            color: #aaa;
+        }
+
+        .mode-toggle {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            background: #3a3a3a;
+            padding: 4px;
+            border-radius: 8px;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: transparent;
+            color: #aaa;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .mode-btn.active {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        @media (max-width: 767px) {
+            body {
+                padding: 5px;
+            }
+            
+            h1 {
+                font-size: 1.3em;
+            }
+            
+            .right-panel {
+                max-height: 50vh;
+            }
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
 
-    <h1>Generator Rang</h1>
+    <h1>🎮 Generator Rang Minecraft</h1>
 
-    <div class="container">
-        
-        <div>
-            <label>Tekst rangi:</label>
-            <input type="text" id="rankText" value="WŁAŚCICIEL" oninput="drawBadge()">
-        </div>
-
-        <div>
-            <label>Styl:</label>
-            <select id="shapeStyle" onchange="drawBadge()">
-                <option value="square">Prostokąt (Styl Byrg)</option>
-                <option value="chamfer">Ścięte rogi (Styl Seav/Minecraft)</option>
-                <option value="rounded">Zaokrąglony</option>
-            </select>
-        </div>
-
-        <div>
-            <label>Kolory tła (Gradient):</label>
-            <div class="color-row">
-                <input type="color" id="color1" value="#ff0000" oninput="drawBadge()">
-                <input type="color" id="color2" value="#ff8800" oninput="drawBadge()">
+    <div class="main-layout">
+        <div class="left-panel">
+            <div class="mode-toggle">
+                <button class="mode-btn active" onclick="setMode('single')">Pojedynczy</button>
+                <button class="mode-btn" onclick="setMode('multi')">Multi (ZIP)</button>
             </div>
-            <label style="font-size: 0.8em; color: #888;">*Dla jednolitego koloru ustaw oba takie same.</label>
-        </div>
-        
-        <div>
-             <label>Kolor tekstu:</label>
-             <div class="color-row">
-                <input type="color" id="textColor" value="#ffffff" oninput="drawBadge()">
-             </div>
+
+            <div class="form-group">
+                <label>Tekst rangi:</label>
+                <input type="text" id="rankText" value="WŁAŚCICIEL" oninput="drawBadge()" placeholder="Wpisz nazwę rangi...">
+            </div>
+
+            <div class="form-group">
+                <label>Styl kształtu:</label>
+                <select id="shapeStyle" onchange="drawBadge()">
+                    <option value="square">Prostokąt (Styl Byrg)</option>
+                    <option value="chamfer">Ścięte rogi (Styl Seav/Minecraft)</option>
+                    <option value="rounded">Zaokrąglony</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Czcionka:</label>
+                <select id="fontStyle" onchange="drawBadge()">
+                    <option value="VT323">VT323 (Pixel Classic)</option>
+                    <option value="Press Start 2P">Press Start 2P (Retro Gaming)</option>
+                    <option value="Russo One">Russo One (Bold Modern)</option>
+                    <option value="Black Ops One">Black Ops One (Military)</option>
+                    <option value="Bungee">Bungee (Urban)</option>
+                    <option value="Quantico">Quantico (Tech/Military)</option>
+                    <option value="Montserrat">Montserrat ExtraBold</option>
+                    <option value="Small Caps">Small Caps (Elegant)</option>
+                    <option value="Uppercase Bold">Uppercase Bold (Systemowa)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Preset gradientów (kliknij aby wybrać):</label>
+                <div class="gradient-presets" id="gradientPresets"></div>
+            </div>
+
+            <div class="form-group">
+                <label>Kolory tła (Gradient):</label>
+                <div class="color-row">
+                    <input type="color" id="color1" value="#ff0000" oninput="drawBadge()">
+                    <input type="color" id="color2" value="#ff8800" oninput="drawBadge()">
+                </div>
+                <label style="font-size: 0.75em; color: #666; margin-top: 5px;">*Dla jednolitego koloru ustaw oba takie same.</label>
+            </div>
+            
+            <div class="form-group">
+                 <label>Kolor tekstu:</label>
+                 <div class="color-row">
+                    <input type="color" id="textColor" value="#ffffff" oninput="drawBadge()">
+                 </div>
+            </div>
+
+            <div class="preview-box">
+                <label>Podgląd:</label>
+                <canvas id="canvas"></canvas>
+            </div>
+
+            <button class="btn btn-success" id="saveBtn" onclick="saveRank()" style="display: none;">
+                💾 Zapisz do listy
+            </button>
+
+            <a id="downloadLink" class="btn btn-primary" download="ranga.png">
+                ⬇️ Pobierz PNG
+            </a>
         </div>
 
-        <div class="preview-box">
-            <label>Podgląd:</label><br>
-            <canvas id="canvas"></canvas>
+        <div class="right-panel" id="rightPanel" style="display: none;">
+            <h3 style="margin-top: 0; margin-bottom: 15px;">📋 Zapisane rangi</h3>
+            <div id="savedList" class="saved-list">
+                <div class="empty-state">Brak zapisanych rang.<br>Kliknij "Zapisz do listy" aby dodać.</div>
+            </div>
+            
+            <div class="zip-section">
+                <div class="counter" id="counter">0 rang zapisanych</div>
+                <button class="btn btn-primary" onclick="downloadZip()" id="zipBtn" disabled>
+                    📦 Pobierz wszystkie jako ZIP
+                </button>
+                <button class="btn btn-danger" onclick="clearAll()" id="clearBtn" disabled>
+                    🗑️ Wyczyść listę
+                </button>
+            </div>
         </div>
-
-        <a id="downloadLink" class="btn-download" download="ranga.png">Pobierz obrazek</a>
     </div>
 
     <script>
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
         const downloadLink = document.getElementById('downloadLink');
+        const saveBtn = document.getElementById('saveBtn');
+        const rightPanel = document.getElementById('rightPanel');
+        const savedList = document.getElementById('savedList');
+        const counter = document.getElementById('counter');
+        const zipBtn = document.getElementById('zipBtn');
+        const clearBtn = document.getElementById('clearBtn');
 
-        // Ładujemy font zanim narysujemy
-        document.fonts.load('30px "VT323"').then(drawBadge);
+        let savedRanks = [];
+        let currentMode = 'single';
+
+        // 20 presetów gradientów
+        const gradientPresets = [
+            { name: 'Fire', c1: '#ff0000', c2: '#ff8800' },
+            { name: 'Ocean', c1: '#0066ff', c2: '#00ccff' },
+            { name: 'Forest', c1: '#228b22', c2: '#90ee90' },
+            { name: 'Purple Haze', c1: '#667eea', c2: '#764ba2' },
+            { name: 'Sunset', c1: '#ff512f', c2: '#dd2476' },
+            { name: 'Gold', c1: '#ffd700', c2: '#ff8c00' },
+            { name: 'Ice', c1: '#00c6ff', c2: '#0072ff' },
+            { name: 'Magma', c1: '#ff416c', c2: '#ff4b2b' },
+            { name: 'Neon', c1: '#b3ffab', c2: '#12fff7' },
+            { name: 'Berry', c1: '#8e2de2', c2: '#4a00e0' },
+            { name: 'Citrus', c1: '#f12711', c2: '#f5af19' },
+            { name: 'Midnight', c1: '#232526', c2: '#414345' },
+            { name: 'Candy', c1: '#ff9a9e', c2: '#fecfef' },
+            { name: 'Rainbow', c1: '#ff0080', c2: '#40e0d0' },
+            { name: 'Blood', c1: '#8a0000', c2: '#ff0000' },
+            { name: 'Toxic', c1: '#a8e063', c2: '#56ab2f' },
+            { name: 'Royal', c1: '#141e30', c2: '#243b55' },
+            { name: 'Peach', c1: '#ffecd2', c2: '#fcb69f' },
+            { name: 'Cosmic', c1: '#20002c', c2: '#cbb4d4' },
+            { name: 'Lemon', c1: '#ffe259', c2: '#ffa751' }
+        ];
+
+        // Generowanie presetów
+        function generatePresets() {
+            const container = document.getElementById('gradientPresets');
+            gradientPresets.forEach((preset, index) => {
+                const btn = document.createElement('div');
+                btn.className = 'preset-btn';
+                btn.style.background = `linear-gradient(135deg, ${preset.c1} 0%, ${preset.c2} 100%)`;
+                btn.title = preset.name;
+                btn.onclick = () => selectPreset(index);
+                container.appendChild(btn);
+            });
+        }
+
+        function selectPreset(index) {
+            const preset = gradientPresets[index];
+            document.getElementById('color1').value = preset.c1;
+            document.getElementById('color2').value = preset.c2;
+            
+            // Aktualizacja aktywnego stanu
+            document.querySelectorAll('.preset-btn').forEach((btn, i) => {
+                btn.classList.toggle('active', i === index);
+            });
+            
+            drawBadge();
+        }
+
+        // Ładowanie czcionek
+        Promise.all([
+            document.fonts.load('30px "VT323"'),
+            document.fonts.load('30px "Press Start 2P"'),
+            document.fonts.load('30px "Russo One"'),
+            document.fonts.load('30px "Black Ops One"'),
+            document.fonts.load('30px "Bungee"'),
+            document.fonts.load('30px "Quantico"'),
+            document.fonts.load('30px "Montserrat"')
+        ]).then(() => {
+            generatePresets();
+            selectPreset(0); // Wybierz pierwszy preset domyślnie
+        });
+
+        function toSmallCaps(text) {
+            return text.toLowerCase().replace(/./g, (char, i) => {
+                return i % 2 === 0 ? char.toUpperCase() : char;
+            });
+        }
 
         function drawBadge() {
-            const text = document.getElementById('rankText').value.toUpperCase();
+            let text = document.getElementById('rankText').value || 'RANGA';
             const color1 = document.getElementById('color1').value;
             const color2 = document.getElementById('color2').value;
             const textColor = document.getElementById('textColor').value;
             const style = document.getElementById('shapeStyle').value;
+            const fontStyle = document.getElementById('fontStyle').value;
 
-            // Ustawienia czcionki
-            const fontSize = 28;
-            ctx.font = `${fontSize}px "VT323"`; // Pixel-style font
+            let fontFamily = fontStyle;
+            let fontSize = 28;
+            let useSmallCaps = false;
+            let useSystemFont = false;
+
+            switch(fontStyle) {
+                case 'Press Start 2P':
+                    fontSize = 16;
+                    break;
+                case 'Montserrat':
+                    fontSize = 24;
+                    break;
+                case 'Small Caps':
+                    fontFamily = 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif';
+                    useSmallCaps = true;
+                    fontSize = 24;
+                    text = toSmallCaps(text);
+                    break;
+                case 'Uppercase Bold':
+                    fontFamily = 'Arial Black, Impact, sans-serif';
+                    useSystemFont = true;
+                    fontSize = 26;
+                    text = text.toUpperCase();
+                    break;
+                default:
+                    text = text.toUpperCase();
+            }
+
+            if (!useSmallCaps && !useSystemFont) {
+                text = text.toUpperCase();
+            }
+
+            ctx.font = `${fontSize}px "${fontFamily}"`;
             
-            // Oblicz szerokość na podstawie tekstu
             const textMetrics = ctx.measureText(text);
             const textWidth = textMetrics.width;
-            
-            // Padding (margines wewnętrzny)
             const paddingX = 20; 
-            const height = 40; // Wysokość rangi
-            const width = textWidth + (paddingX * 2);
+            const height = 40;
+            const width = Math.max(textWidth + (paddingX * 2), 80);
 
-            // Ustaw rozmiar canvasu
             canvas.width = width;
             canvas.height = height;
 
-            // Ponowne ustawienie fontu po zmianie rozmiaru canvasu (resetuje się)
-            ctx.font = `${fontSize}px "VT323"`;
+            ctx.font = `${fontSize}px "${fontFamily}"`;
             ctx.textBaseline = 'middle';
             ctx.textAlign = 'center';
 
-            // --- RYSOWANIE TŁA ---
+            // Tło
             const gradient = ctx.createLinearGradient(0, 0, width, 0);
             gradient.addColorStop(0, color1);
             gradient.addColorStop(1, color2);
             ctx.fillStyle = gradient;
 
             if (style === 'chamfer') {
-                // Rysowanie kształtu ze ściętymi rogami (Minecraft style)
-                const cut = 6; // Wielkość ścięcia
+                const cut = 6;
                 ctx.beginPath();
                 ctx.moveTo(cut, 0);
                 ctx.lineTo(width - cut, 0);
@@ -188,45 +597,155 @@
                 ctx.lineTo(0, height - cut);
                 ctx.lineTo(0, cut);
                 ctx.closePath();
-                
-                // Wypełnienie
                 ctx.fill();
-
-                // Obramowanie (Border) dla stylu Minecraft
                 ctx.strokeStyle = "rgba(0,0,0,0.4)";
                 ctx.lineWidth = 3;
                 ctx.stroke();
-
             } else if (style === 'rounded') {
-                // Zaokrąglone rogi
-                const radius = 10;
                 ctx.beginPath();
-                ctx.roundRect(0, 0, width, height, radius);
+                ctx.roundRect(0, 0, width, height, 10);
                 ctx.fill();
             } else {
-                // Zwykły prostokąt
                 ctx.fillRect(0, 0, width, height);
-                
-                // Opcjonalnie: jasna ramka wewnątrz (jak w stylu byrg)
                 ctx.strokeStyle = "rgba(255,255,255,0.3)";
                 ctx.lineWidth = 2;
                 ctx.strokeRect(2, 2, width-4, height-4);
             }
 
-            // --- RYSOWANIE TEKSTU ---
-            
-            // Cień tekstu (Daje efekt 3D/Pixel)
+            // Tekst z cieniem
             ctx.fillStyle = "black";
-            // Rysujemy cień przesunięty o 2px
             ctx.fillText(text, (width/2) + 2, (height/2) + 2);
-
-            // Główny tekst
             ctx.fillStyle = textColor;
             ctx.fillText(text, width/2, height/2);
 
-            // Aktualizacja linku do pobrania
+            // Aktualizacja linku
             downloadLink.href = canvas.toDataURL("image/png");
         }
+
+        function setMode(mode) {
+            currentMode = mode;
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.classList.toggle('active', 
+                    (mode === 'single' && btn.textContent.includes('Pojedynczy')) ||
+                    (mode === 'multi' && btn.textContent.includes('Multi'))
+                );
+            });
+
+            if (mode === 'multi') {
+                saveBtn.style.display = 'block';
+                downloadLink.style.display = 'none';
+                rightPanel.style.display = 'block';
+            } else {
+                saveBtn.style.display = 'none';
+                downloadLink.style.display = 'block';
+                rightPanel.style.display = 'none';
+            }
+            updateCounter();
+        }
+
+        function saveRank() {
+            const dataUrl = canvas.toDataURL("image/png");
+            const rankData = {
+                id: Date.now(),
+                text: document.getElementById('rankText').value || 'RANGA',
+                dataUrl: dataUrl,
+                settings: {
+                    shape: document.getElementById('shapeStyle').value,
+                    font: document.getElementById('fontStyle').value,
+                    color1: document.getElementById('color1').value,
+                    color2: document.getElementById('color2').value,
+                    textColor: document.getElementById('textColor').value
+                }
+            };
+
+            savedRanks.push(rankData);
+            renderSavedList();
+            updateCounter();
+            
+            // Animacja potwierdzenia
+            saveBtn.textContent = '✅ Zapisano!';
+            setTimeout(() => {
+                saveBtn.textContent = '💾 Zapisz do listy';
+            }, 1000);
+        }
+
+        function renderSavedList() {
+            if (savedRanks.length === 0) {
+                savedList.innerHTML = '<div class="empty-state">Brak zapisanych rang.<br>Kliknij "Zapisz do listy" aby dodać.</div>';
+                return;
+            }
+
+            savedList.innerHTML = savedRanks.map((rank, index) => `
+                <div class="saved-item">
+                    <img src="${rank.dataUrl}" alt="${rank.text}">
+                    <div class="saved-item-info">
+                        <div class="saved-item-name">${rank.text}</div>
+                        <div class="saved-item-meta">${rank.settings.font} • ${rank.settings.shape}</div>
+                    </div>
+                    <button class="btn-danger" onclick="deleteRank(${rank.id})" style="width: auto; padding: 8px 12px; margin: 0;">🗑️</button>
+                </div>
+            `).join('');
+        }
+
+        function deleteRank(id) {
+            savedRanks = savedRanks.filter(r => r.id !== id);
+            renderSavedList();
+            updateCounter();
+        }
+
+        function updateCounter() {
+            counter.textContent = `${savedRanks.length} rang zapisanych`;
+            zipBtn.disabled = savedRanks.length === 0;
+            clearBtn.disabled = savedRanks.length === 0;
+        }
+
+        function clearAll() {
+            if (confirm('Czy na pewno chcesz usunąć wszystkie zapisane rangi?')) {
+                savedRanks = [];
+                renderSavedList();
+                updateCounter();
+            }
+        }
+
+        async function downloadZip() {
+            if (savedRanks.length === 0) return;
+
+            zipBtn.innerHTML = '<span class="loading"></span> Tworzenie ZIP...';
+            zipBtn.disabled = true;
+
+            try {
+                const zip = new JSZip();
+                const folder = zip.folder("rangy-minecraft");
+
+                savedRanks.forEach((rank, index) => {
+                    const base64Data = rank.dataUrl.split(',')[1];
+                    const fileName = `${rank.text.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_${index + 1}.png`;
+                    folder.file(fileName, base64Data, { base64: true });
+                });
+
+                const content = await zip.generateAsync({ type: "blob" });
+                const url = URL.createObjectURL(content);
+                
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `rangy-minecraft-${savedRanks.length}.zip`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+            } catch (error) {
+                alert('Błąd podczas tworzenia ZIP: ' + error.message);
+            }
+
+            zipBtn.innerHTML = '📦 Pobierz wszystkie jako ZIP';
+            zipBtn.disabled = false;
+        }
+
+        // Inicjalizacja
+        window.onload = () => {
+            drawBadge();
+        };
     </script>
 </body>
 </html>
