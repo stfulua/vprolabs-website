@@ -3,112 +3,121 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Generator Rang Minecraft - Multi Mode</title>
+    <title>🎮 Auto Rank Generator Pro</title>
     <link href="https://fonts.googleapis.com/css2?family=VT323&family=Press+Start+2P&family=Russo+One&family=Black+Ops+One&family=Bungee&family=Quantico:wght@700&family=Montserrat:wght@800&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
-        * {
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
         
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #1a1a1a;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
             color: white;
-            margin: 0;
-            padding: 10px;
             min-height: 100vh;
+            padding: 10px;
         }
 
-        h1 { 
-            margin: 0 0 15px 0; 
-            font-size: 1.5em;
+        .header {
             text-align: center;
+            padding: 20px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 15px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255,255,255,0.1);
         }
 
-        .main-layout {
+        .header h1 {
+            font-size: 2em;
+            background: linear-gradient(90deg, #00f260, #0575e6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 5px;
+        }
+
+        .mode-tabs {
             display: flex;
-            gap: 15px;
-            max-width: 1200px;
-            margin: 0 auto;
-            flex-direction: column;
-        }
-
-        @media (min-width: 768px) {
-            .main-layout {
-                flex-direction: row;
-            }
-        }
-
-        .left-panel, .right-panel {
-            background-color: #2a2a2a;
-            padding: 15px;
+            gap: 10px;
+            margin-bottom: 20px;
+            background: rgba(0,0,0,0.3);
+            padding: 5px;
             border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
         }
 
-        .left-panel {
+        .mode-tab {
             flex: 1;
-            min-width: 0;
+            padding: 12px;
+            border: none;
+            background: transparent;
+            color: #888;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
         }
 
-        .right-panel {
-            width: 100%;
-            max-height: 70vh;
-            overflow-y: auto;
+        .mode-tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
         }
 
-        @media (min-width: 768px) {
-            .right-panel {
-                width: 320px;
-                max-height: 80vh;
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        @media (min-width: 1024px) {
+            .main-grid {
+                grid-template-columns: 1fr 1fr;
             }
+        }
+
+        .panel {
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .panel-title {
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            color: #00f260;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .form-group {
             margin-bottom: 15px;
         }
 
-        label { 
+        label {
             display: block;
-            font-size: 0.85em; 
-            color: #aaa; 
-            margin-bottom: 5px;
+            font-size: 0.85em;
+            color: #aaa;
+            margin-bottom: 8px;
             font-weight: 600;
         }
 
         input[type="text"], select {
             width: 100%;
             padding: 12px;
-            background: #3a3a3a;
-            border: 2px solid #4a4a4a;
+            background: rgba(0,0,0,0.3);
+            border: 2px solid rgba(255,255,255,0.1);
             color: white;
-            border-radius: 8px;
-            font-size: 16px; /* Zapobiega zoomowi na iOS */
-            transition: border-color 0.2s;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
         }
 
         input[type="text"]:focus, select:focus {
             outline: none;
-            border-color: #4CAF50;
-        }
-
-        .color-row {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        input[type="color"] {
-            border: none;
-            width: 50px;
-            height: 40px;
-            cursor: pointer;
-            background: none;
-            border-radius: 8px;
-            overflow: hidden;
+            border-color: #00f260;
+            background: rgba(0,0,0,0.5);
         }
 
         .gradient-presets {
@@ -118,218 +127,247 @@
             margin-top: 8px;
         }
 
-        @media (max-width: 480px) {
-            .gradient-presets {
-                grid-template-columns: repeat(3, 1fr);
-            }
+        @media (max-width: 600px) {
+            .gradient-presets { grid-template-columns: repeat(3, 1fr); }
         }
 
         .preset-btn {
-            height: 40px;
-            border: 2px solid transparent;
-            border-radius: 8px;
+            height: 45px;
+            border: 3px solid transparent;
+            border-radius: 10px;
             cursor: pointer;
-            transition: transform 0.2s, border-color 0.2s;
+            transition: all 0.2s;
             position: relative;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
         }
 
-        .preset-btn:hover, .preset-btn.active {
-            transform: scale(1.05);
-            border-color: white;
+        .preset-btn:hover { transform: translateY(-2px) scale(1.05); }
+        .preset-btn.active { 
+            border-color: #00f260; 
+            box-shadow: 0 0 15px rgba(0,242,96,0.5);
         }
-
         .preset-btn.active::after {
             content: '✓';
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 20px;
-            text-shadow: 0 0 3px black;
+            font-size: 24px;
+            text-shadow: 0 0 5px black, 0 0 10px black;
+            font-weight: bold;
         }
 
-        canvas {
-            max-width: 100%;
+        .color-row {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        input[type="color"] {
+            width: 60px;
+            height: 50px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            background: none;
+        }
+
+        .preview-canvas {
+            width: 100%;
+            max-width: 400px;
             height: auto;
             background-image: 
-                linear-gradient(45deg, #666 25%, transparent 25%), 
-                linear-gradient(-45deg, #666 25%, transparent 25%), 
-                linear-gradient(45deg, transparent 75%, #666 75%), 
-                linear-gradient(-45deg, transparent 75%, #666 75%);
+                linear-gradient(45deg, #444 25%, transparent 25%), 
+                linear-gradient(-45deg, #444 25%, transparent 25%), 
+                linear-gradient(45deg, transparent 75%, #444 75%), 
+                linear-gradient(-45deg, transparent 75%, #444 75%);
             background-size: 20px 20px;
             background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
-            border: 2px solid #555;
+            border-radius: 10px;
+            border: 2px solid rgba(255,255,255,0.2);
             image-rendering: pixelated;
-            border-radius: 4px;
             display: block;
             margin: 0 auto;
         }
 
-        .preview-box {
-            text-align: center;
-            padding: 15px;
-            background: #1a1a1a;
-            border-radius: 8px;
-            margin-bottom: 15px;
-        }
-
         .btn {
             width: 100%;
-            padding: 14px;
+            padding: 15px;
             border: none;
-            border-radius: 8px;
+            border-radius: 12px;
             font-size: 16px;
             font-weight: bold;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s;
             margin-bottom: 10px;
-            touch-action: manipulation;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .btn-primary {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
         }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
+        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(102,126,234,0.4); }
 
         .btn-success {
-            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            background: linear-gradient(135deg, #00f260 0%, #0575e6 100%);
+            color: white;
+        }
+        .btn-success:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,242,96,0.4); }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
             color: white;
         }
 
-        .btn-success:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
-        }
-
-        .btn-danger {
-            background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+        .btn-info {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
             color: white;
-            padding: 10px;
-            font-size: 14px;
         }
 
-        .saved-item {
-            background: #3a3a3a;
-            border-radius: 8px;
+        .ranks-list {
+            max-height: 400px;
+            overflow-y: auto;
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
             padding: 10px;
-            margin-bottom: 10px;
+        }
+
+        .rank-item {
             display: flex;
             align-items: center;
-            gap: 10px;
-            border: 2px solid #4a4a4a;
-            transition: border-color 0.2s;
+            gap: 15px;
+            padding: 12px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            margin-bottom: 10px;
+            border: 2px solid transparent;
+            transition: all 0.3s;
         }
 
-        .saved-item:hover {
-            border-color: #667eea;
-        }
-
-        .saved-item img {
-            width: 60px;
-            height: 30px;
+        .rank-item:hover { border-color: rgba(255,255,255,0.2); }
+        .rank-item img {
+            width: 80px;
+            height: 40px;
             object-fit: contain;
-            background: #222;
-            border-radius: 4px;
             image-rendering: pixelated;
+            background: rgba(0,0,0,0.3);
+            border-radius: 5px;
         }
 
-        .saved-item-info {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .saved-item-name {
-            font-weight: bold;
+        .rank-info { flex: 1; }
+        .rank-name { font-weight: bold; font-size: 1.1em; }
+        .rank-char { 
+            font-family: monospace; 
+            color: #00f260; 
             font-size: 0.9em;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            background: rgba(0,0,0,0.3);
+            padding: 2px 8px;
+            border-radius: 5px;
         }
+        .rank-meta { font-size: 0.8em; color: #888; margin-top: 4px; }
 
-        .saved-item-meta {
-            font-size: 0.75em;
-            color: #888;
+        .delete-btn {
+            background: #ff416c;
+            border: none;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
         }
 
         .empty-state {
             text-align: center;
+            padding: 40px;
             color: #666;
-            padding: 40px 20px;
             font-style: italic;
         }
 
-        .zip-section {
-            position: sticky;
-            bottom: 0;
-            background: #2a2a2a;
-            padding-top: 15px;
-            border-top: 2px solid #4a4a4a;
-            margin-top: 10px;
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
         }
 
-        .counter {
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .file-label {
+            display: block;
+            padding: 15px;
+            background: rgba(255,255,255,0.1);
+            border: 2px dashed rgba(255,255,255,0.3);
+            border-radius: 10px;
             text-align: center;
-            margin-bottom: 10px;
-            font-size: 0.9em;
-            color: #aaa;
+            cursor: pointer;
+            transition: all 0.3s;
         }
 
-        .mode-toggle {
-            display: flex;
+        .file-label:hover {
+            background: rgba(255,255,255,0.15);
+            border-color: #00f260;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
             gap: 10px;
             margin-bottom: 15px;
-            background: #3a3a3a;
-            padding: 4px;
-            border-radius: 8px;
         }
 
-        .mode-btn {
-            flex: 1;
-            padding: 10px;
-            border: none;
-            background: transparent;
-            color: #aaa;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.2s;
+        .stat-box {
+            background: rgba(0,0,0,0.3);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
         }
 
-        .mode-btn.active {
-            background: #4CAF50;
-            color: white;
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #00f260;
+        }
+
+        .stat-label {
+            font-size: 0.8em;
+            color: #888;
+            margin-top: 5px;
         }
 
         .checkbox-wrapper {
             display: flex;
             align-items: center;
-            gap: 8px;
-            margin-top: 10px;
+            gap: 10px;
+            margin: 15px 0;
+            padding: 15px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
         }
 
         input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
+            width: 24px;
+            height: 24px;
             cursor: pointer;
         }
 
-        @media (max-width: 767px) {
-            body {
-                padding: 5px;
-            }
-            
-            h1 {
-                font-size: 1.3em;
-            }
-            
-            .right-panel {
-                max-height: 50vh;
-            }
+        .auto-rank-input {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .auto-rank-input input {
+            flex: 1;
+        }
+
+        .auto-rank-input button {
+            width: auto;
+            padding: 12px 20px;
         }
 
         .loading {
@@ -342,169 +380,210 @@
             animation: spin 1s ease-in-out infinite;
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .power2-badge {
+            display: inline-block;
+            background: #00f260;
+            color: black;
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-size: 0.75em;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.2);
+            border-radius: 5px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.2);
+            border-radius: 5px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255,255,255,0.3);
         }
     </style>
 </head>
 <body>
 
-    <h1>🎮 Generator Rang Minecraft</h1>
+    <div class="header">
+        <h1>🎮 AUTO RANK GENERATOR PRO</h1>
+        <p>Generuj rangi Minecraft automatycznie z poprawnymi rozmiarami (potęga 2)</p>
+    </div>
 
-    <div class="main-layout">
-        <div class="left-panel">
-            <div class="mode-toggle">
-                <button class="mode-btn active" onclick="setMode('single')">Pojedynczy</button>
-                <button class="mode-btn" onclick="setMode('multi')">Multi (ZIP)</button>
+    <div class="mode-tabs">
+        <button class="mode-tab active" onclick="setMode('manual')">✏️ Ręczny</button>
+        <button class="mode-tab" onclick="setMode('auto')">⚡ Automatyczny (Bulk)</button>
+    </div>
+
+    <div class="main-grid">
+        <!-- LEWY PANEL -->
+        <div class="panel">
+            <div class="panel-title">⚙️ Konfiguracja</div>
+            
+            <div id="manualMode">
+                <div class="form-group">
+                    <label>Nazwa rangi:</label>
+                    <input type="text" id="rankName" placeholder="np. WŁAŚCICIEL" oninput="updatePreview()">
+                </div>
+            </div>
+
+            <div id="autoMode" style="display: none;">
+                <div class="form-group">
+                    <label>Szybkie dodawanie (jedna nazwa na linię):</label>
+                    <textarea id="bulkNames" rows="4" style="width: 100%; padding: 12px; background: rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.1); color: white; border-radius: 10px; resize: vertical;" placeholder="ADMIN&#10;MODERATOR&#10;HELPER"></textarea>
+                    <button class="btn btn-success" onclick="addBulkRanks()" style="margin-top: 10px;">➕ Dodaj wszystkie</button>
+                </div>
             </div>
 
             <div class="form-group">
-                <label>Tekst rangi:</label>
-                <input type="text" id="rankText" value="WŁAŚCICIEL" oninput="drawBadge()" placeholder="Wpisz nazwę rangi...">
+                <label>Czcionka:</label>
+                <select id="fontStyle" onchange="updatePreview()">
+                    <option value="VT323">VT323 (Pixel Classic)</option>
+                    <option value="Press Start 2P">Press Start 2P (Retro)</option>
+                    <option value="Russo One">Russo One (Bold)</option>
+                    <option value="Black Ops One">Black Ops One (Military)</option>
+                    <option value="Bungee">Bungee (Urban)</option>
+                    <option value="Quantico">Quantico (Tech)</option>
+                    <option value="Montserrat">Montserrat ExtraBold</option>
+                </select>
             </div>
 
             <div class="form-group">
                 <label>Styl kształtu:</label>
-                <select id="shapeStyle" onchange="drawBadge()">
-                    <option value="square">Prostokąt (Styl Byrg)</option>
-                    <option value="chamfer">Ścięte rogi (Styl Seav/Minecraft)</option>
+                <select id="shapeStyle" onchange="updatePreview()">
+                    <option value="chamfer">Ścięte rogi (Minecraft)</option>
+                    <option value="square">Prostokąt</option>
                     <option value="rounded">Zaokrąglony</option>
                 </select>
             </div>
 
             <div class="form-group">
-                <label>Czcionka:</label>
-                <select id="fontStyle" onchange="drawBadge()">
-                    <option value="VT323">VT323 (Pixel Classic)</option>
-                    <option value="Press Start 2P">Press Start 2P (Retro Gaming)</option>
-                    <option value="Russo One">Russo One (Bold Modern)</option>
-                    <option value="Black Ops One">Black Ops One (Military)</option>
-                    <option value="Bungee">Bungee (Urban)</option>
-                    <option value="Quantico">Quantico (Tech/Military)</option>
-                    <option value="Montserrat">Montserrat ExtraBold</option>
-                    <option value="Small Caps">Small Caps (Elegant)</option>
-                    <option value="Uppercase Bold">Uppercase Bold (Systemowa)</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label>Preset gradientów (kliknij aby wybrać):</label>
+                <label>Wybierz gradient:</label>
                 <div class="gradient-presets" id="gradientPresets"></div>
             </div>
 
             <div class="form-group">
-                <label>Kolory tła (Gradient):</label>
+                <label>Kolory (ręczna edycja):</label>
                 <div class="color-row">
-                    <input type="color" id="color1" value="#ff0000" oninput="drawBadge()">
-                    <input type="color" id="color2" value="#ff8800" oninput="drawBadge()">
+                    <input type="color" id="color1" value="#ff0000" oninput="updatePreview()">
+                    <input type="color" id="color2" value="#ff8800" oninput="updatePreview()">
                 </div>
-                <label style="font-size: 0.75em; color: #666; margin-top: 5px;">*Dla jednolitego koloru ustaw oba takie same.</label>
             </div>
-            
+
             <div class="form-group">
-                 <label>Kolor tekstu:</label>
-                 <div class="color-row">
-                    <input type="color" id="textColor" value="#ffffff" oninput="drawBadge()">
-                 </div>
+                <label>Kolor tekstu:</label>
+                <input type="color" id="textColor" value="#ffffff" oninput="updatePreview()" style="width: 60px; height: 40px;">
             </div>
 
-            <div class="preview-box">
-                <label>Podgląd:</label>
-                <canvas id="canvas"></canvas>
+            <div class="checkbox-wrapper">
+                <input type="checkbox" id="power2Check" checked onchange="updatePreview()">
+                <label for="power2Check" style="margin: 0; cursor: pointer;">
+                    Wymuś rozmiar potęgi 2 (dla Minecraft 1.21+) <span class="power2-badge">ZALECANE</span>
+                </label>
             </div>
 
-            <button class="btn btn-success" id="saveBtn" onclick="saveRank()" style="display: none;">
-                💾 Zapisz do listy
-            </button>
+            <div class="form-group" id="previewBox">
+                <label>Podgląd (skalowany do 128x32 dla MC):</label>
+                <canvas id="previewCanvas" class="preview-canvas"></canvas>
+            </div>
 
-            <a id="downloadLink" class="btn btn-primary" download="ranga.png">
-                ⬇️ Pobierz PNG
-            </a>
+            <button class="btn btn-success" onclick="addCurrentRank()">💾 Dodaj rangę do listy</button>
+            
+            <div class="file-input-wrapper" style="margin-top: 10px;">
+                <input type="file" id="mgfLoad" accept=".mgf,.json" onchange="loadMGF(event)">
+                <label for="mgfLoad" class="file-label">📂 Wczytaj .mgf / .json</label>
+            </div>
         </div>
 
-        <div class="right-panel" id="rightPanel" style="display: none;">
-            <h3 style="margin-top: 0; margin-bottom: 15px;">📋 Zapisane rangi</h3>
-            <div id="savedList" class="saved-list">
-                <div class="empty-state">Brak zapisanych rang.<br>Kliknij "Zapisz do listy" aby dodać.</div>
+        <!-- PRAWY PANEL -->
+        <div class="panel">
+            <div class="panel-title">📋 Lista Rang <span id="rankCount" style="color: #888; font-size: 0.8em;">(0/44)</span></div>
+            
+            <div class="stats">
+                <div class="stat-box">
+                    <div class="stat-value" id="statCount">0</div>
+                    <div class="stat-label">Rangi</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="statChars">64</div>
+                    <div class="stat-label">Dostępne</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="statSize">-</div>
+                    <div class="stat-label">Rozmiar</div>
+                </div>
+            </div>
+
+            <div class="ranks-list" id="ranksList">
+                <div class="empty-state">Brak rang. Dodaj pierwszą!</div>
+            </div>
+
+            <div style="margin-top: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <button class="btn btn-warning" onclick="saveMGF()">💾 Zapisz .mgf</button>
+                <button class="btn btn-info" onclick="generateTexturePack()">📦 Generuj TexturePack</button>
             </div>
             
-            <div class="zip-section">
-                <div class="counter" id="counter">0 rang zapisanych</div>
-                <button class="btn btn-primary" onclick="downloadZip()" id="zipBtn" disabled>
-                    📦 Pobierz wszystkie jako ZIP
-                </button>
-                <button class="btn btn-danger" onclick="clearAll()" id="clearBtn" disabled>
-                    🗑️ Wyczyść listę
-                </button>
-            </div>
+            <button class="btn btn-primary" onclick="downloadAllImages()" style="margin-top: 10px;">🖼️ Pobierz same PNG</button>
         </div>
     </div>
 
     <script>
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d');
-        const downloadLink = document.getElementById('downloadLink');
-        const saveBtn = document.getElementById('saveBtn');
-        const rightPanel = document.getElementById('rightPanel');
-        const savedList = document.getElementById('savedList');
-        const counter = document.getElementById('counter');
-        const zipBtn = document.getElementById('zipBtn');
-        const clearBtn = document.getElementById('clearBtn');
-
-        let savedRanks = [];
-        let currentMode = 'single';
-
-        // 20 presetów gradientów
-        const gradientPresets = [
-            { name: 'Fire', c1: '#ff0000', c2: '#ff8800' },
-            { name: 'Ocean', c1: '#0066ff', c2: '#00ccff' },
-            { name: 'Forest', c1: '#228b22', c2: '#90ee90' },
-            { name: 'Purple Haze', c1: '#667eea', c2: '#764ba2' },
-            { name: 'Sunset', c1: '#ff512f', c2: '#dd2476' },
-            { name: 'Gold', c1: '#ffd700', c2: '#ff8c00' },
-            { name: 'Ice', c1: '#00c6ff', c2: '#0072ff' },
-            { name: 'Magma', c1: '#ff416c', c2: '#ff4b2b' },
-            { name: 'Neon', c1: '#b3ffab', c2: '#12fff7' },
-            { name: 'Berry', c1: '#8e2de2', c2: '#4a00e0' },
-            { name: 'Citrus', c1: '#f12711', c2: '#f5af19' },
-            { name: 'Midnight', c1: '#232526', c2: '#414345' },
-            { name: 'Candy', c1: '#ff9a9e', c2: '#fecfef' },
-            { name: 'Rainbow', c1: '#ff0080', c2: '#40e0d0' },
-            { name: 'Blood', c1: '#8a0000', c2: '#ff0000' },
-            { name: 'Toxic', c1: '#a8e063', c2: '#56ab2f' },
-            { name: 'Royal', c1: '#141e30', c2: '#243b55' },
-            { name: 'Peach', c1: '#ffecd2', c2: '#fcb69f' },
-            { name: 'Cosmic', c1: '#20002c', c2: '#cbb4d4' },
-            { name: 'Lemon', c1: '#ffe259', c2: '#ffa751' }
+        // UNICODE CHARACTERS - 64 slots ( to )
+        const UNICODE_CHARS = [
+            "","","","","","","","","","","","","","","","",
+            "","","","","","","","","","","","","","","","",
+            "","","","","","","","","","","","","","","","",
+            "","","","","","","","","","","","","","","",""
         ];
 
-        // Generowanie presetów
-        function generatePresets() {
-            const container = document.getElementById('gradientPresets');
-            gradientPresets.forEach((preset, index) => {
-                const btn = document.createElement('div');
-                btn.className = 'preset-btn';
-                btn.style.background = `linear-gradient(135deg, ${preset.c1} 0%, ${preset.c2} 100%)`;
-                btn.title = preset.name;
-                btn.onclick = () => selectPreset(index);
-                container.appendChild(btn);
-            });
-        }
+        // FILE NAMES mapping (first 32 are reserved, 32-44 are new from image)
+        const FILE_NAMES = [
+            "member-seav","media-seav","manager-seav","helper-seav","mvp-seav","mvpplus-seav","mvpplusplus-seav",
+            "mod-seav","noob-seav","owner-seav","admin-seav","pro-seav","twitch-seav","og-seav","builder-seav",
+            "vip-seav","vipplus-seav","dev-seav","designer-seav","god-seav","elite-seav","eliteplus-seav",
+            "youtube-seav","broadcast-seav","partner-seav","npc-seav","twitchbyrg","vipbyrg","vipplusbyrg",
+            "yellowbyrg","youtubebyrg","memberbyrg",
+            // NEW ONES FROM IMAGE (32-44)
+            "admin","chatmod","chill","elita","gracz","helper","moderator","owner","pomocnik","sponsor","technik","testhelper","vip",
+            // NULL placeholders (45-63)
+            "null","null","null","null","null","null","null","null","null","null",
+            "null","null","null","null","null","null","null","null","null"
+        ];
 
-        function selectPreset(index) {
-            const preset = gradientPresets[index];
-            document.getElementById('color1').value = preset.c1;
-            document.getElementById('color2').value = preset.c2;
-            
-            // Aktualizacja aktywnego stanu
-            document.querySelectorAll('.preset-btn').forEach((btn, i) => {
-                btn.classList.toggle('active', i === index);
-            });
-            
-            drawBadge();
-        }
+        const GRADIENTS = [
+            {name: "Fire", c1: "#ff0000", c2: "#ff8800"},
+            {name: "Ocean", c1: "#0066ff", c2: "#00ccff"},
+            {name: "Forest", c1: "#228b22", c2: "#90ee90"},
+            {name: "Purple", c1: "#667eea", c2: "#764ba2"},
+            {name: "Sunset", c1: "#ff512f", c2: "#dd2476"},
+            {name: "Gold", c1: "#ffd700", c2: "#ff8c00"},
+            {name: "Ice", c1: "#00c6ff", c2: "#0072ff"},
+            {name: "Magma", c1: "#ff416c", c2: "#ff4b2b"},
+            {name: "Neon", c1: "#b3ffab", c2: "#12fff7"},
+            {name: "Berry", c1: "#8e2de2", c2: "#4a00e0"},
+            {name: "Citrus", c1: "#f12711", c2: "#f5af19"},
+            {name: "Midnight", c1: "#232526", c2: "#414345"},
+            {name: "Candy", c1: "#ff9a9e", c2: "#fecfef"},
+            {name: "Rainbow", c1: "#ff0080", c2: "#40e0d0"},
+            {name: "Blood", c1: "#8a0000", c2: "#ff0000"},
+            {name: "Toxic", c1: "#a8e063", c2: "#56ab2f"},
+            {name: "Royal", c1: "#141e30", c2: "#243b55"},
+            {name: "Peach", c1: "#ffecd2", c2: "#fcb69f"},
+            {name: "Cosmic", c1: "#20002c", c2: "#cbb4d4"},
+            {name: "Lemon", c1: "#ffe259", c2: "#ffa751"}
+        ];
 
-        // Ładowanie czcionek
+        let ranks = [];
+        let currentGradient = GRADIENTS[0];
+        let currentMode = 'manual';
+
+        // Load fonts
         Promise.all([
             document.fonts.load('30px "VT323"'),
             document.fonts.load('30px "Press Start 2P"'),
@@ -514,79 +593,97 @@
             document.fonts.load('30px "Quantico"'),
             document.fonts.load('30px "Montserrat"')
         ]).then(() => {
-            generatePresets();
-            selectPreset(0); // Wybierz pierwszy preset domyślnie
+            initPresets();
+            updatePreview();
         });
 
-        function toSmallCaps(text) {
-            return text.toLowerCase().replace(/./g, (char, i) => {
-                return i % 2 === 0 ? char.toUpperCase() : char;
+        function initPresets() {
+            const container = document.getElementById('gradientPresets');
+            GRADIENTS.forEach((g, i) => {
+                const btn = document.createElement('div');
+                btn.className = 'preset-btn';
+                btn.style.background = `linear-gradient(135deg, ${g.c1} 0%, ${g.c2} 100%)`;
+                btn.title = g.name;
+                btn.onclick = () => selectGradient(i);
+                container.appendChild(btn);
             });
+            selectGradient(0);
         }
 
-        function drawBadge() {
-            let text = document.getElementById('rankText').value || 'RANGA';
-            const color1 = document.getElementById('color1').value;
-            const color2 = document.getElementById('color2').value;
-            const textColor = document.getElementById('textColor').value;
-            const style = document.getElementById('shapeStyle').value;
-            const fontStyle = document.getElementById('fontStyle').value;
+        function selectGradient(index) {
+            currentGradient = GRADIENTS[index];
+            document.getElementById('color1').value = currentGradient.c1;
+            document.getElementById('color2').value = currentGradient.c2;
+            document.querySelectorAll('.preset-btn').forEach((b, i) => {
+                b.classList.toggle('active', i === index);
+            });
+            updatePreview();
+        }
 
-            let fontFamily = fontStyle;
-            let fontSize = 28;
-            let useSmallCaps = false;
-            let useSystemFont = false;
+        function setMode(mode) {
+            currentMode = mode;
+            document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById('manualMode').style.display = mode === 'manual' ? 'block' : 'none';
+            document.getElementById('autoMode').style.display = mode === 'auto' ? 'block' : 'none';
+        }
 
-            switch(fontStyle) {
-                case 'Press Start 2P':
-                    fontSize = 16;
-                    break;
-                case 'Montserrat':
-                    fontSize = 24;
-                    break;
-                case 'Small Caps':
-                    fontFamily = 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif';
-                    useSmallCaps = true;
-                    fontSize = 24;
-                    text = toSmallCaps(text);
-                    break;
-                case 'Uppercase Bold':
-                    fontFamily = 'Arial Black, Impact, sans-serif';
-                    useSystemFont = true;
-                    fontSize = 26;
-                    text = text.toUpperCase();
-                    break;
-                default:
-                    text = text.toUpperCase();
-            }
-
-            if (!useSmallCaps && !useSystemFont) {
-                text = text.toUpperCase();
-            }
-
-            ctx.font = `${fontSize}px "${fontFamily}"`;
+        function getPowerOf2Size(textWidth) {
+            const padding = 20;
+            const height = 32; // Fixed height for MC
+            let width = textWidth + (padding * 2);
             
+            // Round up to nearest power of 2
+            const powers = [64, 128, 256, 512];
+            for (let p of powers) {
+                if (width <= p) return { width: p, height };
+            }
+            return { width: 512, height };
+        }
+
+        function drawRankToCanvas(canvas, text, options = {}) {
+            const ctx = canvas.getContext('2d');
+            const fontStyle = options.font || 'VT323';
+            const shape = options.shape || 'chamfer';
+            const color1 = options.c1 || '#ff0000';
+            const color2 = options.c2 || '#ff8800';
+            const textColor = options.textColor || '#ffffff';
+            const forcePower2 = options.power2 !== false;
+
+            let fontSize = 24;
+            if (fontStyle === 'Press Start 2P') fontSize = 14;
+            else if (fontStyle === 'Montserrat') fontSize = 20;
+
+            ctx.font = `bold ${fontSize}px "${fontStyle}"`;
             const textMetrics = ctx.measureText(text);
-            const textWidth = textMetrics.width;
-            const paddingX = 20; 
-            const height = 40;
-            const width = Math.max(textWidth + (paddingX * 2), 80);
+            
+            let width, height;
+            if (forcePower2) {
+                const size = getPowerOf2Size(textMetrics.width);
+                width = size.width;
+                height = size.height;
+            } else {
+                width = textMetrics.width + 40;
+                height = 32;
+            }
 
             canvas.width = width;
             canvas.height = height;
 
-            ctx.font = `${fontSize}px "${fontFamily}"`;
+            // Redraw with correct size
+            ctx.font = `bold ${fontSize}px "${fontStyle}"`;
             ctx.textBaseline = 'middle';
             ctx.textAlign = 'center';
 
-            // Tło
-            const gradient = ctx.createLinearGradient(0, 0, width, 0);
-            gradient.addColorStop(0, color1);
-            gradient.addColorStop(1, color2);
-            ctx.fillStyle = gradient;
+            // Background gradient
+            const grad = ctx.createLinearGradient(0, 0, width, 0);
+            grad.addColorStop(0, color1);
+            grad.addColorStop(1, color2);
+            ctx.fillStyle = grad;
 
-            if (style === 'chamfer') {
-                const cut = 6;
+            // Shape
+            if (shape === 'chamfer') {
+                const cut = Math.min(6, height/4);
                 ctx.beginPath();
                 ctx.moveTo(cut, 0);
                 ctx.lineTo(width - cut, 0);
@@ -599,153 +696,275 @@
                 ctx.closePath();
                 ctx.fill();
                 ctx.strokeStyle = "rgba(0,0,0,0.4)";
-                ctx.lineWidth = 3;
+                ctx.lineWidth = 2;
                 ctx.stroke();
-            } else if (style === 'rounded') {
+            } else if (shape === 'rounded') {
                 ctx.beginPath();
-                ctx.roundRect(0, 0, width, height, 10);
+                ctx.roundRect(0, 0, width, height, 8);
                 ctx.fill();
             } else {
                 ctx.fillRect(0, 0, width, height);
-                ctx.strokeStyle = "rgba(255,255,255,0.3)";
+                ctx.strokeStyle = "rgba(255,255,255,0.2)";
                 ctx.lineWidth = 2;
                 ctx.strokeRect(2, 2, width-4, height-4);
             }
 
-            // Tekst z cieniem
-            ctx.fillStyle = "black";
-            ctx.fillText(text, (width/2) + 2, (height/2) + 2);
+            // Text shadow
+            ctx.fillStyle = "rgba(0,0,0,0.8)";
+            ctx.fillText(text, (width/2) + 1, (height/2) + 1);
+
+            // Main text
             ctx.fillStyle = textColor;
             ctx.fillText(text, width/2, height/2);
 
-            // Aktualizacja linku
-            downloadLink.href = canvas.toDataURL("image/png");
+            return { width, height };
         }
 
-        function setMode(mode) {
-            currentMode = mode;
-            document.querySelectorAll('.mode-btn').forEach(btn => {
-                btn.classList.toggle('active', 
-                    (mode === 'single' && btn.textContent.includes('Pojedynczy')) ||
-                    (mode === 'multi' && btn.textContent.includes('Multi'))
-                );
+        function updatePreview() {
+            const canvas = document.getElementById('previewCanvas');
+            const text = document.getElementById('rankName').value || 'PREVIEW';
+            const size = drawRankToCanvas(canvas, text.toUpperCase(), {
+                font: document.getElementById('fontStyle').value,
+                shape: document.getElementById('shapeStyle').value,
+                c1: document.getElementById('color1').value,
+                c2: document.getElementById('color2').value,
+                textColor: document.getElementById('textColor').value,
+                power2: document.getElementById('power2Check').checked
             });
+            document.getElementById('statSize').textContent = `${size.width}x${size.height}`;
+        }
 
-            if (mode === 'multi') {
-                saveBtn.style.display = 'block';
-                downloadLink.style.display = 'none';
-                rightPanel.style.display = 'block';
-            } else {
-                saveBtn.style.display = 'none';
-                downloadLink.style.display = 'block';
-                rightPanel.style.display = 'none';
+        function addCurrentRank() {
+            const name = document.getElementById('rankName').value.trim();
+            if (!name) {
+                alert('Wpisz nazwę rangi!');
+                return;
             }
-            updateCounter();
+            addRank(name);
+            document.getElementById('rankName').value = '';
+            updatePreview();
         }
 
-        function saveRank() {
-            const dataUrl = canvas.toDataURL("image/png");
-            const rankData = {
-                id: Date.now(),
-                text: document.getElementById('rankText').value || 'RANGA',
-                dataUrl: dataUrl,
-                settings: {
-                    shape: document.getElementById('shapeStyle').value,
-                    font: document.getElementById('fontStyle').value,
-                    color1: document.getElementById('color1').value,
-                    color2: document.getElementById('color2').value,
-                    textColor: document.getElementById('textColor').value
-                }
-            };
-
-            savedRanks.push(rankData);
-            renderSavedList();
-            updateCounter();
-            
-            // Animacja potwierdzenia
-            saveBtn.textContent = '✅ Zapisano!';
-            setTimeout(() => {
-                saveBtn.textContent = '💾 Zapisz do listy';
-            }, 1000);
+        function addBulkRanks() {
+            const text = document.getElementById('bulkNames').value;
+            const names = text.split('\n').map(n => n.trim()).filter(n => n);
+            names.forEach(name => addRank(name));
+            document.getElementById('bulkNames').value = '';
         }
 
-        function renderSavedList() {
-            if (savedRanks.length === 0) {
-                savedList.innerHTML = '<div class="empty-state">Brak zapisanych rang.<br>Kliknij "Zapisz do listy" aby dodać.</div>';
+        function addRank(name) {
+            if (ranks.length >= 44) {
+                alert('Osiągnięto limit 44 rang (tyle masz slotów w JSON)!');
                 return;
             }
 
-            savedList.innerHTML = savedRanks.map((rank, index) => `
-                <div class="saved-item">
-                    <img src="${rank.dataUrl}" alt="${rank.text}">
-                    <div class="saved-item-info">
-                        <div class="saved-item-name">${rank.text}</div>
-                        <div class="saved-item-meta">${rank.settings.font} • ${rank.settings.shape}</div>
+            const canvas = document.createElement('canvas');
+            const size = drawRankToCanvas(canvas, name.toUpperCase(), {
+                font: document.getElementById('fontStyle').value,
+                shape: document.getElementById('shapeStyle').value,
+                c1: document.getElementById('color1').value,
+                c2: document.getElementById('color2').value,
+                textColor: document.getElementById('textColor').value,
+                power2: true
+            });
+
+            const rank = {
+                id: Date.now(),
+                name: name.toUpperCase(),
+                displayName: name,
+                dataUrl: canvas.toDataURL('image/png'),
+                width: size.width,
+                height: size.height,
+                settings: {
+                    font: document.getElementById('fontStyle').value,
+                    shape: document.getElementById('shapeStyle').value,
+                    c1: document.getElementById('color1').value,
+                    c2: document.getElementById('color2').value,
+                    textColor: document.getElementById('textColor').value
+                },
+                char: UNICODE_CHARS[ranks.length],
+                fileName: FILE_NAMES[ranks.length] || 'null'
+            };
+
+            ranks.push(rank);
+            renderRanks();
+        }
+
+        function renderRanks() {
+            const list = document.getElementById('ranksList');
+            document.getElementById('rankCount').textContent = `(${ranks.length}/44)`;
+            document.getElementById('statCount').textContent = ranks.length;
+            document.getElementById('statChars').textContent = 64 - ranks.length;
+
+            if (ranks.length === 0) {
+                list.innerHTML = '<div class="empty-state">Brak rang. Dodaj pierwszą!</div>';
+                return;
+            }
+
+            list.innerHTML = ranks.map((r, i) => `
+                <div class="rank-item">
+                    <img src="${r.dataUrl}" alt="${r.name}">
+                    <div class="rank-info">
+                        <div class="rank-name">${r.displayName}</div>
+                        <div class="rank-char">${r.char} → ${r.fileName}.png</div>
+                        <div class="rank-meta">${r.settings.font} • ${r.width}x${r.height}</div>
                     </div>
-                    <button class="btn-danger" onclick="deleteRank(${rank.id})" style="width: auto; padding: 8px 12px; margin: 0;">🗑️</button>
+                    <button class="delete-btn" onclick="deleteRank(${r.id})">🗑️</button>
                 </div>
             `).join('');
         }
 
         function deleteRank(id) {
-            savedRanks = savedRanks.filter(r => r.id !== id);
-            renderSavedList();
-            updateCounter();
+            ranks = ranks.filter(r => r.id !== id);
+            // Reassign chars and filenames
+            ranks.forEach((r, i) => {
+                r.char = UNICODE_CHARS[i];
+                r.fileName = FILE_NAMES[i] || 'null';
+            });
+            renderRanks();
         }
 
-        function updateCounter() {
-            counter.textContent = `${savedRanks.length} rang zapisanych`;
-            zipBtn.disabled = savedRanks.length === 0;
-            clearBtn.disabled = savedRanks.length === 0;
-        }
-
-        function clearAll() {
-            if (confirm('Czy na pewno chcesz usunąć wszystkie zapisane rangi?')) {
-                savedRanks = [];
-                renderSavedList();
-                updateCounter();
+        function saveMGF() {
+            if (ranks.length === 0) {
+                alert('Brak rang do zapisania!');
+                return;
             }
+            
+            const mgfData = {
+                version: "2.0",
+                generator: "AutoRankPro",
+                created: new Date().toISOString(),
+                ranks: ranks.map(r => ({
+                    name: r.displayName,
+                    settings: r.settings
+                }))
+            };
+
+            const blob = new Blob([JSON.stringify(mgfData, null, 2)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `ranks-config-${ranks.length}.mgf`;
+            a.click();
+            URL.revokeObjectURL(url);
         }
 
-        async function downloadZip() {
-            if (savedRanks.length === 0) return;
+        function loadMGF(event) {
+            const file = event.target.files[0];
+            if (!file) return;
 
-            zipBtn.innerHTML = '<span class="loading"></span> Tworzenie ZIP...';
-            zipBtn.disabled = true;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    if (data.ranks && Array.isArray(data.ranks)) {
+                        // Clear current
+                        ranks = [];
+                        
+                        // Load each rank
+                        data.ranks.forEach(r => {
+                            if (r.settings) {
+                                document.getElementById('fontStyle').value = r.settings.font || 'VT323';
+                                document.getElementById('shapeStyle').value = r.settings.shape || 'chamfer';
+                                document.getElementById('color1').value = r.settings.c1 || '#ff0000';
+                                document.getElementById('color2').value = r.settings.c2 || '#ff8800';
+                                document.getElementById('textColor').value = r.settings.textColor || '#ffffff';
+                            }
+                            addRank(r.name);
+                        });
+                        
+                        alert(`Wczytano ${data.ranks.length} rang!`);
+                    } else {
+                        alert('Nieprawidłowy format pliku MGF!');
+                    }
+                } catch (err) {
+                    alert('Błąd wczytywania: ' + err.message);
+                }
+            };
+            reader.readAsText(file);
+        }
 
-            try {
-                const zip = new JSZip();
-                const folder = zip.folder("rangy-minecraft");
+        async function generateTexturePack() {
+            if (ranks.length === 0) {
+                alert('Brak rang do wygenerowania!');
+                return;
+            }
 
-                savedRanks.forEach((rank, index) => {
-                    const base64Data = rank.dataUrl.split(',')[1];
-                    const fileName = `${rank.text.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_${index + 1}.png`;
-                    folder.file(fileName, base64Data, { base64: true });
+            const zip = new JSZip();
+            
+            // Create folder structure
+            const assets = zip.folder("assets").folder("minecraft");
+            const textures = assets.folder("textures").folder("ranks");
+            const font = assets.folder("font");
+
+            // Generate JSON providers
+            const providers = ranks.map((r, i) => ({
+                type: "bitmap",
+                file: `minecraft:ranks/${r.fileName}.png`,
+                ascent: 7,
+                height: 7,
+                chars: [r.char]
+            }));
+
+            // Fill remaining slots with null
+            for (let i = ranks.length; i < 64; i++) {
+                providers.push({
+                    type: "bitmap",
+                    file: "minecraft:ranks/null.png",
+                    ascent: 7,
+                    height: 7,
+                    chars: [UNICODE_CHARS[i]]
                 });
-
-                const content = await zip.generateAsync({ type: "blob" });
-                const url = URL.createObjectURL(content);
-                
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `rangy-minecraft-${savedRanks.length}.zip`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-
-            } catch (error) {
-                alert('Błąd podczas tworzenia ZIP: ' + error.message);
             }
 
-            zipBtn.innerHTML = '📦 Pobierz wszystkie jako ZIP';
-            zipBtn.disabled = false;
+            const fontJson = { providers };
+            font.file("default.json", JSON.stringify(fontJson, null, 4));
+
+            // Add images
+            ranks.forEach(r => {
+                const base64 = r.dataUrl.split(',')[1];
+                textures.file(`${r.fileName}.png`, base64, {base64: true});
+            });
+
+            // Add null.png (1x1 transparent)
+            const nullPng = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==";
+            textures.file("null.png", nullPng, {base64: true});
+
+            // pack.mcmeta
+            const mcmeta = {
+                pack: {
+                    pack_format: 46,
+                    description: "    §b§lChill§f§lBlock - Auto Generated Ranks"
+                }
+            };
+            zip.file("pack.mcmeta", JSON.stringify(mcmeta, null, 4));
+
+            // Generate ZIP
+            const content = await zip.generateAsync({type: "blob"});
+            const url = URL.createObjectURL(content);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `ChillBlock-Ranks-${ranks.length}.zip`;
+            a.click();
+            URL.revokeObjectURL(url);
         }
 
-        // Inicjalizacja
-        window.onload = () => {
-            drawBadge();
-        };
+        function downloadAllImages() {
+            if (ranks.length === 0) return;
+            
+            ranks.forEach((r, i) => {
+                setTimeout(() => {
+                    const a = document.createElement('a');
+                    a.href = r.dataUrl;
+                    a.download = `${r.fileName}.png`;
+                    a.click();
+                }, i * 100);
+            });
+        }
+
+        // Init
+        updatePreview();
     </script>
 </body>
 </html>
