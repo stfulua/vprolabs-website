@@ -1,0 +1,10 @@
+{
+  "headers": [
+    {
+      "source": "/ChillBlock.zip",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "*" }
+      ]
+    }
+  ]
+}
